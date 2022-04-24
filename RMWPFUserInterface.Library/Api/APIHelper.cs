@@ -6,17 +6,19 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Configuration;
-using RMWPFUserInterface.Models;
+using RMWPFUserInterface.Library.Models;
 
-namespace RMWPFUserInterface.Helpers
+namespace RMWPFUserInterface.Library.Api
 {
     public class APIHelper : IAPIHelper
     {
         private HttpClient _apiClient;
+        private ILoggedInUserModel _loggedInUser;
 
-        public APIHelper()
+        public APIHelper(ILoggedInUserModel loggedInUserModel)
         {
             InitializeClient();
+            _loggedInUser = loggedInUserModel;
         }
 
         private void InitializeClient()
@@ -43,6 +45,32 @@ namespace RMWPFUserInterface.Helpers
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<AuthenticatedUser>();
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
+        public async Task GetLoggedInUserDetails(string token)
+        {
+            _apiClient.DefaultRequestHeaders.Accept.Clear();
+            _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            using (HttpResponseMessage response = await _apiClient.GetAsync("/api/User"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var userDetails = await response.Content.ReadAsAsync<LoggedInUserModel>();
+                    
+                    _loggedInUser.Token = token;
+                    _loggedInUser.Id = userDetails.Id;
+                    _loggedInUser.FirstName = userDetails.FirstName;
+                    _loggedInUser.LastName = userDetails.LastName;
+                    _loggedInUser.EmailAddress = userDetails.EmailAddress;
+                    _loggedInUser.CreatedDate = userDetails.CreatedDate;
                 }
                 else
                 {

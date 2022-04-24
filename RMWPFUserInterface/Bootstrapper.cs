@@ -1,5 +1,7 @@
 ﻿using Caliburn.Micro;
 using RMWPFUserInterface.Helpers;
+using RMWPFUserInterface.Library.Api;
+using RMWPFUserInterface.Library.Models;
 using RMWPFUserInterface.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -32,6 +34,7 @@ namespace RMWPFUserInterface
             _container
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
+                .Singleton<ILoggedInUserModel, LoggedInUserModel>()
                 .Singleton<IAPIHelper, APIHelper>();  
 
             GetType().Assembly.GetTypes()

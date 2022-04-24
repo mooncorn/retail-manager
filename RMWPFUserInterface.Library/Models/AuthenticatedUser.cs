@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RMWPFUserInterface.Models
+namespace RMWPFUserInterface.Library.Models
 {
     public class AuthenticatedUser
     {
