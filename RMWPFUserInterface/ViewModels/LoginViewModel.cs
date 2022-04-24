@@ -1,4 +1,6 @@
 ﻿using Caliburn.Micro;
+using RMWPFUserInterface.Helpers;
+using RMWPFUserInterface.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,12 @@ namespace RMWPFUserInterface.ViewModels
     {
         private string _username;
         private string _password;
+        private IAPIHelper _apiHelper;
+
+        public LoginViewModel(IAPIHelper apiHelper)
+        {
+            _apiHelper = apiHelper;
+        }
 
         public string Username
         {
@@ -42,9 +50,15 @@ namespace RMWPFUserInterface.ViewModels
             }
         }
 
-        public void Login()
+        public async Task Login()
         {
-            
+            try
+            {
+                AuthenticatedUser result = await _apiHelper.Authenticate(Username, Password);
+            } catch (Exception ex)
+            {
+                
+            }
         }
 
     }

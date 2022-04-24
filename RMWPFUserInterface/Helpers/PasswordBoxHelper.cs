@@ -39,9 +39,7 @@ namespace RMWPFUserInterface.Helpers
             d.SetValue(BoundPasswordProperty, value);
         }
 
-        private static void OnBoundPasswordChanged(
-            DependencyObject d,
-            DependencyPropertyChangedEventArgs e)
+        private static void OnBoundPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var box = d as PasswordBox;
 
