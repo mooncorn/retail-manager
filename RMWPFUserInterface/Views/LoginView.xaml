@@ -19,19 +19,23 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Text="Login" FontSize="28" Margin="0 0 0 20"/>
         
         <!-- Username Row -->
-        <TextBlock Grid.Row="2" Grid.Column="1" Text="Username" Margin="0 0 0 10"/>
-        <TextBox x:Name="Username" Grid.Row="2" Grid.Column="2" Width="200" Margin="10 0 0 10"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="Username:" Margin="0 0 0 10"/>
+        <TextBox x:Name="Username" Grid.Row="2" Grid.Column="2" MinWidth="300" Margin="10 0 0 10"/>
         
         <!-- Password Row -->
-        <TextBlock Grid.Row="3" Grid.Column="1" Text="Password" Margin="0 0 0 10"/>
-        <PasswordBox x:Name="Password" Grid.Row="3" Grid.Column="2" Width="200" Margin="10 0 0 10" />
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="Password:" Margin="0 0 0 10"/>
+        <PasswordBox x:Name="Password" Grid.Row="3" Grid.Column="2" MinWidth="300" Margin="10 0 0 10" />
 
         <!-- Login Button Row -->
-        <Button x:Name="Login" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Center" Grid.ColumnSpan="2" Padding="15 0" Content="Login"/>
+        <Button x:Name="Login" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Center" Grid.ColumnSpan="2" Padding="15 0" Content="Login" Margin="0 0 0 10"/>
+
+        <!-- Error Message Row -->
+        <TextBlock x:Name="ErrorMessage" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" MaxWidth="290" TextWrapping="Wrap" Foreground="Red" Visibility="{Binding IsErrorVisible, Source={StaticResource BooleanToVisibilityConverter}}"/>
     </Grid>
 </UserControl>
