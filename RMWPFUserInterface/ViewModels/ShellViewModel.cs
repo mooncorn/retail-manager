@@ -1,20 +1,34 @@
 ﻿using Caliburn.Micro;
+using RMWPFUserInterface.EventModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RMWPFUserInterface.ViewModels
 {
-    public class ShellViewModel : Conductor<object>
+    public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
     {
-        private LoginViewModel _loginViewModel;
+        private SalesViewModel _salesViewModel;
+        private IEventAggregator _events;
+        private SimpleContainer _container;
 
-        public ShellViewModel(LoginViewModel loginVM)
+        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, SimpleContainer container)
         {
-            _loginViewModel = loginVM;
-            ActivateItemAsync(loginVM);
+            _salesViewModel = salesVM;
+            _events = events;
+            _container = container;
+
+            _events.SubscribeOnUIThread(this);
+
+            ActivateItemAsync(_container.GetInstance<LoginViewModel>());
+        }
+
+        public async Task HandleAsync(LogOnEvent logOnEvent, CancellationToken cancellationToken)
+        {
+            await ActivateItemAsync(_salesViewModel);
         }
     }
 }

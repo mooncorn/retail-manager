@@ -55,7 +55,7 @@ namespace RMWPFUserInterface.Library.Api
 
         public async Task GetLoggedInUserDetails(string token)
         {
-            _apiClient.DefaultRequestHeaders.Accept.Clear();
+            _apiClient.DefaultRequestHeaders.Clear();
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 

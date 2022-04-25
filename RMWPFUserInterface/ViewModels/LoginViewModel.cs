@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using RMWPFUserInterface.EventModels;
 using RMWPFUserInterface.Library.Api;
 using RMWPFUserInterface.Library.Models;
 using System;
@@ -15,10 +16,12 @@ namespace RMWPFUserInterface.ViewModels
         private string _password;
         private IAPIHelper _apiHelper;
         private string _errorMessage;
+        private IEventAggregator _events;
 
-        public LoginViewModel(IAPIHelper apiHelper)
+        public LoginViewModel(IAPIHelper apiHelper, IEventAggregator events)
         {
             _apiHelper = apiHelper;
+            _events = events;
         }
 
         public string Username
@@ -66,6 +69,8 @@ namespace RMWPFUserInterface.ViewModels
 
                 AuthenticatedUser result = await _apiHelper.Authenticate(Username, Password);
                 await _apiHelper.GetLoggedInUserDetails(result.Access_Token);
+
+                await _events.PublishOnUIThreadAsync(new LogOnEvent());
 
             } catch (Exception ex)
             {
