@@ -150,30 +150,16 @@ namespace RMWPFUserInterface.ViewModels
 
         public decimal CalculateSubTotal()
         {
-            decimal subTotal = 0;
-
-            foreach (var item in Cart)
-            {
-                subTotal += item.Product.RetailPrice * item.QuantityInCart;
-            }
-
-            return subTotal;
+            return Cart.Sum((cartItem) => cartItem.Product.RetailPrice * cartItem.QuantityInCart);
         }
 
         public decimal CalculateTaxAmount()
         {
-            decimal taxAmount = 0;
             decimal taxRate = Convert.ToDecimal(_configHelper.TaxRate)/100;
 
-            foreach (var item in Cart)
-            {
-                if (item.Product.IsTaxable)
-                {
-                    taxAmount += item.Product.RetailPrice * item.QuantityInCart * taxRate;
-                }
-            }
-
-            return taxAmount;
+            return Cart
+                .Where((cartItem) => cartItem.Product.IsTaxable)
+                .Sum((cartItem) => cartItem.Product.RetailPrice * cartItem.QuantityInCart * taxRate);
         }
     }
 }
