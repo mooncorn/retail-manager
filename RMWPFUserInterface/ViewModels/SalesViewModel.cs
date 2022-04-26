@@ -133,10 +133,7 @@ namespace RMWPFUserInterface.ViewModels
             if (existingItem != null)
             {
                 existingItem.QuantityInCart += ItemQuantity;
-
-                // There should be a better way of refreshing the cart display
-                Cart.Remove(existingItem);
-                Cart.Add(existingItem);
+                Cart.ResetBindings();
             }
             else
             {
@@ -150,6 +147,7 @@ namespace RMWPFUserInterface.ViewModels
             }
 
             SelectedProduct.QuantityInStock -= ItemQuantity;
+            Products.ResetBindings();
             ItemQuantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
         }
