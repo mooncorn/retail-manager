@@ -16,6 +16,5 @@ namespace RMWPFUserInterface.Library.Models
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
         public bool IsTaxable { get; set; }
-        public string DisplayText { get { return $"{ProductName} ({QuantityInStock})"; } }
     }
 }
