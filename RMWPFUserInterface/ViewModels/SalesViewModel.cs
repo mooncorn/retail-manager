@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using RMWPFUserInterface.Helpers;
 using RMWPFUserInterface.Library.Api;
 using RMWPFUserInterface.Library.Models;
 using System;
@@ -17,6 +18,7 @@ namespace RMWPFUserInterface.ViewModels
         private BindingList<CartItemModel> _cart;
         private int _itemQuantity;
         private IProductAPIConsumer _productAPIConsumer;
+        private IConfigHelper _configHelper;
 
         public BindingList<ProductModel> Products
         {
@@ -61,30 +63,11 @@ namespace RMWPFUserInterface.ViewModels
             }
         }
 
-        public string SubTotal
-        {
-            get 
-            { 
-                decimal subTotal = 0;
+        public string SubTotal { get { return CalculateSubTotal().ToString("C"); } }
 
-                foreach (var item in Cart)
-                {
-                    subTotal += item.Product.RetailPrice * item.QuantityInCart;
-                }
+        public string Tax { get { return CalculateTaxAmount().ToString("C"); } }
 
-                return subTotal.ToString("C"); // convert to currency format
-            }
-        }
-
-        public string Tax
-        {
-            get { return "$0.00"; }
-        }
-
-        public string Total
-        {
-            get { return "$0.00"; }
-        }
+        public string Total { get { return (CalculateSubTotal() + CalculateTaxAmount()).ToString("C"); } }
 
         public bool CanAddToCart
         {
@@ -110,9 +93,10 @@ namespace RMWPFUserInterface.ViewModels
             }
         }
 
-        public SalesViewModel(IProductAPIConsumer productAPIConsumer)
+        public SalesViewModel(IProductAPIConsumer productAPIConsumer, IConfigHelper configHelper)
         {
             _productAPIConsumer = productAPIConsumer;
+            _configHelper = configHelper;
             Cart = new BindingList<CartItemModel>();
             _itemQuantity = 1;
         }
@@ -150,6 +134,8 @@ namespace RMWPFUserInterface.ViewModels
             Products.ResetBindings();
             ItemQuantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public void RemoveFromCart()
@@ -160,6 +146,34 @@ namespace RMWPFUserInterface.ViewModels
         public void CheckOut()
         {
 
+        }
+
+        public decimal CalculateSubTotal()
+        {
+            decimal subTotal = 0;
+
+            foreach (var item in Cart)
+            {
+                subTotal += item.Product.RetailPrice * item.QuantityInCart;
+            }
+
+            return subTotal;
+        }
+
+        public decimal CalculateTaxAmount()
+        {
+            decimal taxAmount = 0;
+            decimal taxRate = Convert.ToDecimal(_configHelper.TaxRate)/100;
+
+            foreach (var item in Cart)
+            {
+                if (item.Product.IsTaxable)
+                {
+                    taxAmount += item.Product.RetailPrice * item.QuantityInCart * taxRate;
+                }
+            }
+
+            return taxAmount;
         }
     }
 }

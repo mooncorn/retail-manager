@@ -3,7 +3,7 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT Id, ProductName, [Description], RetailPrice, QuantityInStock, CreatedDate, LastModified
+	SELECT Id, ProductName, [Description], RetailPrice, QuantityInStock, CreatedDate, LastModified, IsTaxable
 	FROM [dbo].[Product]
 	ORDER BY ProductName;
 END
