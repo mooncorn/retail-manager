@@ -13,17 +13,15 @@ namespace RMWPFUserInterface.ViewModels
     {
         private SalesViewModel _salesViewModel;
         private IEventAggregator _events;
-        private SimpleContainer _container;
 
-        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, SimpleContainer container)
+        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events)
         {
             _salesViewModel = salesVM;
             _events = events;
-            _container = container;
 
             _events.SubscribeOnUIThread(this);
 
-            ActivateItemAsync(_container.GetInstance<LoginViewModel>());
+            ActivateItemAsync(IoC.Get<LoginViewModel>());
         }
 
         public async Task HandleAsync(LogOnEvent logOnEvent, CancellationToken cancellationToken)
