@@ -13,7 +13,8 @@ namespace RMWPFUserInterface.ViewModels
     public class SalesViewModel : Screen
     {
         private BindingList<ProductModel> _products;
-        private BindingList<string> _cart;
+        private ProductModel _selectedProduct;
+        private BindingList<CartItemModel> _cart;
         private int _itemQuantity;
         private IProductAPIConsumer _productAPIConsumer;
 
@@ -27,7 +28,19 @@ namespace RMWPFUserInterface.ViewModels
             }
         }
 
-        public BindingList<string> Cart
+        public ProductModel SelectedProduct 
+        { 
+            get { return _selectedProduct; } 
+            set
+            {
+                _selectedProduct = value;
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAddToCart);
+                NotifyOfPropertyChange(() => Products);
+            } 
+        }
+
+        public BindingList<CartItemModel> Cart
         {
             get { return _cart; }
             set
@@ -44,12 +57,23 @@ namespace RMWPFUserInterface.ViewModels
             {
                 _itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
+                NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
         public string SubTotal
         {
-            get { return "$0.00"; }
+            get 
+            { 
+                decimal subTotal = 0;
+
+                foreach (var item in Cart)
+                {
+                    subTotal += item.Product.RetailPrice * item.QuantityInCart;
+                }
+
+                return subTotal.ToString("C"); // convert to currency format
+            }
         }
 
         public string Tax
@@ -66,7 +90,7 @@ namespace RMWPFUserInterface.ViewModels
         {
             get
             {
-                return true;
+                return ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity;
             }
         }
 
@@ -74,7 +98,7 @@ namespace RMWPFUserInterface.ViewModels
         {
             get
             {
-                return true;
+                return false;
             }
         }
 
@@ -82,13 +106,15 @@ namespace RMWPFUserInterface.ViewModels
         {
             get
             {
-                return true;
+                return false;
             }
         }
 
         public SalesViewModel(IProductAPIConsumer productAPIConsumer)
         {
             _productAPIConsumer = productAPIConsumer;
+            Cart = new BindingList<CartItemModel>();
+            _itemQuantity = 1;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -103,7 +129,29 @@ namespace RMWPFUserInterface.ViewModels
 
         public void AddToCart()
         {
+            var existingItem = Cart.FirstOrDefault((item) => item.Product.Id == SelectedProduct.Id);
+            if (existingItem != null)
+            {
+                existingItem.QuantityInCart += ItemQuantity;
 
+                // There should be a better way of refreshing the cart display
+                Cart.Remove(existingItem);
+                Cart.Add(existingItem);
+            }
+            else
+            {
+                CartItemModel cartItem = new CartItemModel
+                {
+                    Product = SelectedProduct,
+                    QuantityInCart = ItemQuantity,
+                };
+
+                Cart.Add(cartItem);
+            }
+
+            SelectedProduct.QuantityInStock -= ItemQuantity;
+            ItemQuantity = 1;
+            NotifyOfPropertyChange(() => SubTotal);
         }
 
         public void RemoveFromCart()

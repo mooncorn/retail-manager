@@ -11,9 +11,10 @@ namespace RMWPFUserInterface.Library.Models
         public int Id { get; set; }
         public string ProductName { get; set; }
         public string Description { get; set; }
-        public double RetailPrice { get; set; }
+        public decimal RetailPrice { get; set; }
         public int QuantityInStock { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
+        public string DisplayText { get { return $"{ProductName} ({QuantityInStock})"; } }
     }
 }
