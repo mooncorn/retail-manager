@@ -67,7 +67,7 @@ namespace RMWPFUserInterface.ViewModels
             {
                 ErrorMessage = String.Empty;
 
-                AuthenticatedUser result = await _apiHelper.Authenticate(Username, Password);
+                AuthenticatedUserModel result = await _apiHelper.Authenticate(Username, Password);
                 await _apiHelper.GetLoggedInUserDetails(result.Access_Token);
 
                 await _events.PublishOnUIThreadAsync(new LogOnEvent());

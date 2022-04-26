@@ -15,6 +15,8 @@ namespace RMWPFUserInterface.Library.Api
         private HttpClient _apiClient;
         private ILoggedInUserModel _loggedInUser;
 
+        public HttpClient ApiClient { get { return _apiClient; } }
+
         public APIHelper(ILoggedInUserModel loggedInUserModel)
         {
             InitializeClient();
@@ -31,7 +33,7 @@ namespace RMWPFUserInterface.Library.Api
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<AuthenticatedUser> Authenticate(string username, string password)
+        public async Task<AuthenticatedUserModel> Authenticate(string username, string password)
         {
             var data = new FormUrlEncodedContent(new[]
             {
@@ -44,7 +46,7 @@ namespace RMWPFUserInterface.Library.Api
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsAsync<AuthenticatedUser>();
+                    return await response.Content.ReadAsAsync<AuthenticatedUserModel>();
                 }
                 else
                 {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RMWPFUserInterface.Library.Models
 {
-    public class AuthenticatedUser
+    public class AuthenticatedUserModel
     {
         public string Access_Token { get; set; }
         public string UserName { get; set; }

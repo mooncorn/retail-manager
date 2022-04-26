@@ -37,10 +37,15 @@
 
         <!-- Product List -->
         <TextBlock Text="Products" Grid.Column="1" Grid.Row="1"/>
-        <ListBox x:Name="Products" Grid.Row="2" Grid.Column="1"
-                 MinHeight="200" MinWidth="200"/>
+        <ListBox x:Name="Products" Grid.Row="2" Grid.Column="1" MinHeight="200" MinWidth="200">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ProductName}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
-        <!-- Product List Actions -->
+            <!-- Product List Actions -->
         <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2" Margin="30 0">
             <TextBlock Text="Quantity"/>
             <TextBox x:Name="ItemQuantity" MinWidth="100" Margin="0 0 0 10"/>

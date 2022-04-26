@@ -1,4 +1,6 @@
 ﻿using Caliburn.Micro;
+using RMWPFUserInterface.Library.Api;
+using RMWPFUserInterface.Library.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,11 +12,12 @@ namespace RMWPFUserInterface.ViewModels
 {
     public class SalesViewModel : Screen
     {
-        private BindingList<string> _products;
+        private BindingList<ProductModel> _products;
         private BindingList<string> _cart;
         private int _itemQuantity;
+        private IProductAPIConsumer _productAPIConsumer;
 
-        public BindingList<string> Products
+        public BindingList<ProductModel> Products
         {
             get { return _products; }
             set 
@@ -81,6 +84,21 @@ namespace RMWPFUserInterface.ViewModels
             {
                 return true;
             }
+        }
+
+        public SalesViewModel(IProductAPIConsumer productAPIConsumer)
+        {
+            _productAPIConsumer = productAPIConsumer;
+        }
+
+        protected override async void OnViewLoaded(object view)
+        {
+            await LoadProducts();
+        }
+
+        private async Task LoadProducts()
+        {
+            Products = new BindingList<ProductModel>(await _productAPIConsumer.GetAll());
         }
 
         public void AddToCart()
