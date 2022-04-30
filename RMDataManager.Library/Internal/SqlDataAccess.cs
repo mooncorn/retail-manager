@@ -8,7 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Dapper;
 
-namespace TRMDataManager.Library.Internal.DataAccess
+namespace RMDataManager.Library.Internal.DataAccess
 {
     internal class SqlDataAccess
     {
