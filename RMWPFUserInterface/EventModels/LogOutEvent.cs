@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RMWPFUserInterface.EventModels
 {
-    public class CheckOutSuccess
+    public class LogOutEvent
     {
     }
 }

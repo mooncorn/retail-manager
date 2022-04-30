@@ -174,7 +174,7 @@ namespace RMWPFUserInterface.ViewModels
             }
 
             await _saleAPIConsumer.PostSale(saleModel);
-            await _events.PublishOnUIThreadAsync(new CheckOutSuccess());
+            await _events.PublishOnUIThreadAsync(new CheckOutEvent());
         }
 
         public decimal CalculateSubTotal()

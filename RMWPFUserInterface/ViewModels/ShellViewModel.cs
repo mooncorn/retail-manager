@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RMWPFUserInterface.EventModels;
+using RMWPFUserInterface.Library.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +10,32 @@ using System.Threading.Tasks;
 
 namespace RMWPFUserInterface.ViewModels
 {
-    public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>, IHandle<CheckOutSuccess>
+    public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>, IHandle<CheckOutEvent>
     {
         private SalesViewModel _salesViewModel;
+        private ILoggedInUserModel _loggedInUser;
         private IEventAggregator _events;
 
-        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events)
+        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, ILoggedInUserModel loggedInUser)
         {
             _salesViewModel = salesVM;
             _events = events;
+            _loggedInUser = loggedInUser;
 
             _events.SubscribeOnUIThread(this);
 
             ActivateItemAsync(IoC.Get<LoginViewModel>());
+        }
+
+        public async void ExitApplication()
+        {
+            await TryCloseAsync();
+        }
+
+        public async void LogOut()
+        {
+            _loggedInUser.Clear();
+            await ActivateItemAsync(IoC.Get<LoginViewModel>());
         }
 
         public async Task HandleAsync(LogOnEvent logOnEvent, CancellationToken cancellationToken)
@@ -29,7 +43,7 @@ namespace RMWPFUserInterface.ViewModels
             await ActivateItemAsync(_salesViewModel);
         }
 
-        public async Task HandleAsync(CheckOutSuccess checkOutSuccessEvent, CancellationToken cancellationToken)
+        public async Task HandleAsync(CheckOutEvent checkOutEvent, CancellationToken cancellationToken)
         {
             await ActivateItemAsync(IoC.Get<SalesViewModel>());
         }
