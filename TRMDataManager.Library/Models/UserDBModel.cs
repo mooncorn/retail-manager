@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TRMDataManager.Library.Models
 {
-    public class UserModel
+    public class UserDBModel
     {
         public string Id { get; set; }
         public string FirstName { get; set; }

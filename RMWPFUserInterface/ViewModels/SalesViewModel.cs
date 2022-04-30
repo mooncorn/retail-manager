@@ -18,6 +18,7 @@ namespace RMWPFUserInterface.ViewModels
         private BindingList<CartItemModel> _cart;
         private int _itemQuantity;
         private IProductAPIConsumer _productAPIConsumer;
+        private ISaleAPIConsumer _saleAPIConsumer;
         private IConfigHelper _configHelper;
 
         public BindingList<ProductModel> Products
@@ -69,13 +70,7 @@ namespace RMWPFUserInterface.ViewModels
 
         public string Total { get { return (CalculateSubTotal() + CalculateTaxAmount()).ToString("C"); } }
 
-        public bool CanAddToCart
-        {
-            get
-            {
-                return ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity;
-            }
-        }
+        public bool CanAddToCart { get { return ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity; } }
 
         public bool CanRemoveFromCart
         {
@@ -85,17 +80,12 @@ namespace RMWPFUserInterface.ViewModels
             }
         }
 
-        public bool CanCheckOut
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool CanCheckOut { get { return _cart.Count > 0; } }
 
-        public SalesViewModel(IProductAPIConsumer productAPIConsumer, IConfigHelper configHelper)
+        public SalesViewModel(IProductAPIConsumer productAPIConsumer, ISaleAPIConsumer saleAPIConsumer, IConfigHelper configHelper)
         {
             _productAPIConsumer = productAPIConsumer;
+            _saleAPIConsumer = saleAPIConsumer;
             _configHelper = configHelper;
             Cart = new BindingList<CartItemModel>();
             _itemQuantity = 1;
@@ -136,6 +126,7 @@ namespace RMWPFUserInterface.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public void RemoveFromCart()
@@ -143,9 +134,20 @@ namespace RMWPFUserInterface.ViewModels
 
         }
 
-        public void CheckOut()
+        public async Task CheckOut()
         {
+            SaleModel saleModel = new SaleModel();
 
+            foreach (CartItemModel item in Cart)
+            {
+                saleModel.SaleDetails.Add(new SaleDetailsModel
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.QuantityInCart
+                });
+            }
+
+            await _saleAPIConsumer.PostSale(saleModel);
         }
 
         public decimal CalculateSubTotal()

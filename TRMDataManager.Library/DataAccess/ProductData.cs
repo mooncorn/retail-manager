@@ -10,10 +10,16 @@ namespace TRMDataManager.Library.DataAccess
 {
     public class ProductData
     {
-        public List<ProductModel> GetAll()
+        public List<ProductDBModel> GetAll()
         {
             SqlDataAccess sqlDataAccess = new SqlDataAccess();
-            return sqlDataAccess.LoadData<ProductModel, dynamic>("spProduct_GetAll", null, "RMData");
+            return sqlDataAccess.LoadData<ProductDBModel, dynamic>("spProduct_GetAll", null, "RMData");
+        }
+
+        public ProductDBModel GetById(int id)
+        {
+            SqlDataAccess sqlDataAccess = new SqlDataAccess();
+            return sqlDataAccess.LoadData<ProductDBModel, dynamic>("spProduct_GetById", new {Id = id}, "RMData").FirstOrDefault();
         }
     }
 }

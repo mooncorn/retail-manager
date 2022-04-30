@@ -14,7 +14,7 @@ namespace RMDataManager.Controllers
     public class UserController : ApiController
     {
         [HttpGet]
-        public UserModel GetById()
+        public UserDBModel GetById()
         {
             string userId = RequestContext.Principal.Identity.GetUserId();
             UserData data = new UserData();

@@ -51,12 +51,16 @@
     <Compile Include="Api\APIHelper.cs" />
     <Compile Include="Api\IAPIHelper.cs" />
     <Compile Include="Api\IProductAPIConsumer.cs" />
+    <Compile Include="Api\ISaleAPIConsumer.cs" />
     <Compile Include="Api\ProductAPIConsumer.cs" />
+    <Compile Include="Api\SaleAPIConsumer.cs" />
     <Compile Include="Models\AuthenticatedUserModel.cs" />
     <Compile Include="Models\CartItemModel.cs" />
     <Compile Include="Models\ILoggedInUserModel.cs" />
     <Compile Include="Models\LoggedInUserModel.cs" />
     <Compile Include="Models\ProductModel.cs" />
+    <Compile Include="Models\SaleDetailsModel.cs" />
+    <Compile Include="Models\SaleModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

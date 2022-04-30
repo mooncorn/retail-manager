@@ -15,7 +15,7 @@ namespace RMDataManager.Controllers
     {
         [HttpGet]
         [Route("All")]
-        public List<ProductModel> GetAll()
+        public List<ProductDBModel> GetAll()
         {
             ProductData productData = new ProductData();
             return productData.GetAll();

@@ -10,13 +10,13 @@ namespace TRMDataManager.Library.DataAccess
 {
     public class UserData
     {
-        public UserModel GetUserById(string Id)
+        public UserDBModel GetUserById(string Id)
         {
             SqlDataAccess sqlDataAccess = new SqlDataAccess();
 
             var parameters = new { Id = Id };
 
-            return sqlDataAccess.LoadData<UserModel, dynamic>("dbo.spUserLookup", parameters, "RMData").First();
+            return sqlDataAccess.LoadData<UserDBModel, dynamic>("dbo.spUserLookup", parameters, "RMData").First();
         }
     }
 }
