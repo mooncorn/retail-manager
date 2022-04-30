@@ -16,6 +16,7 @@ namespace RMWPFUserInterface.ViewModels
         private BindingList<ProductModel> _products;
         private ProductModel _selectedProduct;
         private BindingList<CartItemModel> _cart;
+        private CartItemModel _selectedCartProduct;
         private int _itemQuantity;
         private IProductAPIConsumer _productAPIConsumer;
         private ISaleAPIConsumer _saleAPIConsumer;
@@ -39,7 +40,6 @@ namespace RMWPFUserInterface.ViewModels
                 _selectedProduct = value;
                 NotifyOfPropertyChange(() => SelectedProduct);
                 NotifyOfPropertyChange(() => CanAddToCart);
-                NotifyOfPropertyChange(() => Products);
             } 
         }
 
@@ -53,6 +53,17 @@ namespace RMWPFUserInterface.ViewModels
             }
         }
 
+        public CartItemModel SelectedCartProduct
+        {
+            get { return _selectedCartProduct; }
+            set
+            {
+                _selectedCartProduct = value;
+                NotifyOfPropertyChange(() => SelectedCartProduct);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
+            }
+        }
+
         public int ItemQuantity
         {
             get { return _itemQuantity; }
@@ -61,6 +72,7 @@ namespace RMWPFUserInterface.ViewModels
                 _itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
                 NotifyOfPropertyChange(() => CanAddToCart);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
             }
         }
 
@@ -72,13 +84,7 @@ namespace RMWPFUserInterface.ViewModels
 
         public bool CanAddToCart { get { return ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity; } }
 
-        public bool CanRemoveFromCart
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool CanRemoveFromCart { get { return ItemQuantity > 0 && SelectedCartProduct?.QuantityInCart >= ItemQuantity; } }
 
         public bool CanCheckOut { get { return _cart.Count > 0; } }
 
@@ -131,7 +137,23 @@ namespace RMWPFUserInterface.ViewModels
 
         public void RemoveFromCart()
         {
+            var existingItem = Products.FirstOrDefault((item) => item.Id == SelectedCartProduct.Product.Id);
+            if (existingItem == null)
+                throw new Exception("Product does not exist in the product list");
 
+            existingItem.QuantityInStock += ItemQuantity;
+            SelectedCartProduct.QuantityInCart -= ItemQuantity;
+
+            if (SelectedCartProduct.QuantityInCart == 0)
+                Cart.Remove(SelectedCartProduct);
+
+            Products.ResetBindings();
+            Cart.ResetBindings();
+            ItemQuantity = 1;
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public async Task CheckOut()
