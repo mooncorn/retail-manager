@@ -12,6 +12,10 @@ namespace RMDataManager.Library.Internal.DataAccess
 {
     internal class SqlDataAccess : IDisposable
     {
+        private IDbConnection _connection;
+        private IDbTransaction _transaction;
+        private bool isClosed;
+
         public string GetConnectionString(string name)
         {
             return ConfigurationManager.ConnectionStrings[name].ConnectionString;
@@ -37,9 +41,6 @@ namespace RMDataManager.Library.Internal.DataAccess
             }
         }
 
-        private IDbConnection _connection;
-        private IDbTransaction _transaction;
-
         public void StartTransaction(string connectionStringName)
         {
             string connectionString = GetConnectionString(connectionStringName);
@@ -47,23 +48,39 @@ namespace RMDataManager.Library.Internal.DataAccess
             _connection = new SqlConnection(connectionString);
             _connection.Open();
             _transaction = _connection.BeginTransaction();
+            isClosed = false;
         }
 
         public void CommitTransaction()
         {
             _transaction?.Commit();
             _connection?.Close();
+            isClosed = true;
         }
 
         public void RollbackTransaction()
         {
             _transaction?.Rollback();
             _connection?.Close();
+            isClosed = true;
         }
 
         public void Dispose()
         {
-            CommitTransaction();
+            if (!isClosed)
+            {
+                try
+                {
+                    CommitTransaction();
+                }
+                catch
+                {
+                    // TODO: Log this issue
+                }
+            }
+                
+            _transaction = null;
+            _connection = null;
         }
 
         public void SaveDataInTransaction<T>(string storedProcedure, T parameters)
