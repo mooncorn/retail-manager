@@ -16,7 +16,6 @@ namespace RMDataManager.Library.DataAccess
             // TODO: Make this better please
 
             ProductData productData = new ProductData();
-            SqlDataAccess sqlDataAccess = new SqlDataAccess();
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
 
             foreach (SaleDetailModel item in saleInfo.SaleDetails)
@@ -52,20 +51,33 @@ namespace RMDataManager.Library.DataAccess
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            // Save the sale model
-            sqlDataAccess.SaveDate("spSale_Insert", sale, "RMData");
-
-            // Get the id of inserted sale
-            var parameters = new { sale.SellerId, sale.SaleDate };
-            sale.Id = sqlDataAccess.LoadData<int, dynamic>("spSale_Lookup", parameters, "RMData").FirstOrDefault();
-
-            // Finish filling in the sale detail models
-            foreach (SaleDetailDBModel detail in details)
+            using (SqlDataAccess sqlDataAccess = new SqlDataAccess())
             {
-                detail.SaleId = sale.Id;
+                try
+                {
+                    sqlDataAccess.StartTransaction("RMData");
 
-                // Save the detail models
-                sqlDataAccess.SaveDate("spSaleDetail_Insert", detail, "RMData");
+                    // Save the sale model
+                    sqlDataAccess.SaveDataInTransaction("spSale_Insert", sale);
+
+                    // Get the id of inserted sale
+                    var parameters = new { sale.SellerId, sale.SaleDate };
+                    sale.Id = sqlDataAccess.LoadDataInTransaction<int, dynamic>("spSale_Lookup", parameters).FirstOrDefault();
+
+                    // Finish filling in the sale detail models
+                    foreach (SaleDetailDBModel detail in details)
+                    {
+                        detail.SaleId = sale.Id;
+
+                        // Save the detail models
+                        sqlDataAccess.SaveDataInTransaction("spSaleDetail_Insert", detail);
+                    }
+                }
+                catch
+                {
+                    sqlDataAccess.RollbackTransaction();
+                    throw; // throw original exception
+                }
             }
         }
     }
