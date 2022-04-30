@@ -11,8 +11,8 @@
             <MenuItem Header="_File">
                 <MenuItem x:Name="ExitApplication" Header="E_xit"/>
             </MenuItem>
-            <MenuItem Header="_Account">
-                <MenuItem x:Name="LogOut" Header="_Logout"/>
+            <MenuItem Header="_Account" Visibility="{Binding IsAccountVisible, Converter={StaticResource BooleanToVisibilityConverter}}" >
+                <MenuItem x:Name="LogOut" Header="_Logout" />
             </MenuItem>
         </Menu>
         <Grid>

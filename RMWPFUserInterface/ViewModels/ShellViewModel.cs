@@ -16,6 +16,11 @@ namespace RMWPFUserInterface.ViewModels
         private ILoggedInUserModel _loggedInUser;
         private IEventAggregator _events;
 
+        public bool IsLoggedIn
+        {
+            get { return !string.IsNullOrEmpty(_loggedInUser.Token); }
+        }
+
         public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, ILoggedInUserModel loggedInUser)
         {
             _salesViewModel = salesVM;
@@ -36,11 +41,13 @@ namespace RMWPFUserInterface.ViewModels
         {
             _loggedInUser.Clear();
             await ActivateItemAsync(IoC.Get<LoginViewModel>());
+            NotifyOfPropertyChange(() => IsLoggedIn);
         }
 
         public async Task HandleAsync(LogOnEvent logOnEvent, CancellationToken cancellationToken)
         {
             await ActivateItemAsync(_salesViewModel);
+            NotifyOfPropertyChange(() => IsLoggedIn);
         }
 
         public async Task HandleAsync(CheckOutEvent checkOutEvent, CancellationToken cancellationToken)
