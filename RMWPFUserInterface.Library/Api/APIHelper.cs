@@ -80,5 +80,10 @@ namespace RMWPFUserInterface.Library.Api
                 }
             }
         }
+
+        public void ClearHeaders()
+        {
+            _apiClient.DefaultRequestHeaders.Clear();
+        }
     }
 }

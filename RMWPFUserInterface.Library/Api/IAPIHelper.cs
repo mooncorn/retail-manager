@@ -9,5 +9,6 @@ namespace RMWPFUserInterface.Library.Api
         HttpClient ApiClient { get; }
         Task<AuthenticatedUserModel> Authenticate(string username, string password);
         Task GetLoggedInUserDetails(string token);
+        void ClearHeaders();
     }
 }

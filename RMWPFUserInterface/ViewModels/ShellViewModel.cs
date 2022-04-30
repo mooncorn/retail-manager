@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RMWPFUserInterface.EventModels;
+using RMWPFUserInterface.Library.Api;
 using RMWPFUserInterface.Library.Models;
 using System;
 using System.Collections.Generic;
@@ -15,17 +16,19 @@ namespace RMWPFUserInterface.ViewModels
         private SalesViewModel _salesViewModel;
         private ILoggedInUserModel _loggedInUser;
         private IEventAggregator _events;
+        private IAPIHelper _apiHelper;
 
         public bool IsLoggedIn
         {
             get { return !string.IsNullOrEmpty(_loggedInUser.Token); }
         }
 
-        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, ILoggedInUserModel loggedInUser)
+        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, ILoggedInUserModel loggedInUser, IAPIHelper apiHelper)
         {
             _salesViewModel = salesVM;
             _events = events;
             _loggedInUser = loggedInUser;
+            _apiHelper = apiHelper;
 
             _events.SubscribeOnUIThread(this);
 
@@ -40,6 +43,7 @@ namespace RMWPFUserInterface.ViewModels
         public async void LogOut()
         {
             _loggedInUser.Clear();
+            _apiHelper.ClearHeaders();
             await ActivateItemAsync(IoC.Get<LoginViewModel>());
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
