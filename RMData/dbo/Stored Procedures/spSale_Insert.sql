@@ -11,4 +11,6 @@ BEGIN
 
 	INSERT INTO dbo.Sale(SellerId, SaleDate, SubTotal, Total, Tax) 
 	VALUES (@SellerId, @SaleDate, @SubTotal, @Total, @Tax);
+
+	SELECT @Id = SCOPE_IDENTITY();
 END
