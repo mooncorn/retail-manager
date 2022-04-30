@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RMWPFUserInterface.ViewModels
 {
-    public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
+    public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>, IHandle<CheckOutSuccess>
     {
         private SalesViewModel _salesViewModel;
         private IEventAggregator _events;
@@ -27,6 +27,11 @@ namespace RMWPFUserInterface.ViewModels
         public async Task HandleAsync(LogOnEvent logOnEvent, CancellationToken cancellationToken)
         {
             await ActivateItemAsync(_salesViewModel);
+        }
+
+        public async Task HandleAsync(CheckOutSuccess checkOutSuccessEvent, CancellationToken cancellationToken)
+        {
+            await ActivateItemAsync(IoC.Get<SalesViewModel>());
         }
     }
 }

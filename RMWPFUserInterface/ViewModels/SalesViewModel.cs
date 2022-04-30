@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using RMWPFUserInterface.EventModels;
 using RMWPFUserInterface.Helpers;
 using RMWPFUserInterface.Library.Api;
 using RMWPFUserInterface.Library.Models;
@@ -21,6 +22,7 @@ namespace RMWPFUserInterface.ViewModels
         private IProductAPIConsumer _productAPIConsumer;
         private ISaleAPIConsumer _saleAPIConsumer;
         private IConfigHelper _configHelper;
+        private IEventAggregator _events;
 
         public BindingList<ProductModel> Products
         {
@@ -88,11 +90,13 @@ namespace RMWPFUserInterface.ViewModels
 
         public bool CanCheckOut { get { return _cart.Count > 0; } }
 
-        public SalesViewModel(IProductAPIConsumer productAPIConsumer, ISaleAPIConsumer saleAPIConsumer, IConfigHelper configHelper)
+        public SalesViewModel(IProductAPIConsumer productAPIConsumer, ISaleAPIConsumer saleAPIConsumer, 
+            IConfigHelper configHelper, IEventAggregator events)
         {
             _productAPIConsumer = productAPIConsumer;
             _saleAPIConsumer = saleAPIConsumer;
             _configHelper = configHelper;
+            _events = events;
             Cart = new BindingList<CartItemModel>();
             _itemQuantity = 1;
         }
@@ -170,6 +174,7 @@ namespace RMWPFUserInterface.ViewModels
             }
 
             await _saleAPIConsumer.PostSale(saleModel);
+            await _events.PublishOnUIThreadAsync(new CheckOutSuccess());
         }
 
         public decimal CalculateSubTotal()
