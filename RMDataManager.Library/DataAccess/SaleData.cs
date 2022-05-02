@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RMDataManager.Library.Internal.DataAccess;
-using RMDataManager.Library.Models;
+using TRMDataManager.Library.Models;
 
 namespace RMDataManager.Library.DataAccess
 {
@@ -79,6 +79,12 @@ namespace RMDataManager.Library.DataAccess
                     throw; // throw original exception
                 }
             }
+        }
+
+        public List<SaleReportModel> GetSaleReport()
+        {
+            SqlDataAccess sqlDataAccess = new SqlDataAccess();
+            return sqlDataAccess.LoadData<SaleReportModel, dynamic>("spSale_SaleReport", null, "RMData");
         }
     }
 }
