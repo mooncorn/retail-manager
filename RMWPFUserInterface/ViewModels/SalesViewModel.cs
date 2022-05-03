@@ -6,9 +6,11 @@ using RMWPFUserInterface.Library.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RMWPFUserInterface.ViewModels
 {
@@ -18,6 +20,8 @@ namespace RMWPFUserInterface.ViewModels
         private ProductModel _selectedProduct;
         private BindingList<CartItemModel> _cart;
         private CartItemModel _selectedCartProduct;
+        private StatusInfoViewModel _statusInfo;
+        private readonly IWindowManager _windowManager;
         private int _itemQuantity;
         private IProductAPIConsumer _productAPIConsumer;
         private ISaleAPIConsumer _saleAPIConsumer;
@@ -91,19 +95,46 @@ namespace RMWPFUserInterface.ViewModels
         public bool CanCheckOut { get { return _cart.Count > 0; } }
 
         public SalesViewModel(IProductAPIConsumer productAPIConsumer, ISaleAPIConsumer saleAPIConsumer, 
-            IConfigHelper configHelper, IEventAggregator events)
+            IConfigHelper configHelper, IEventAggregator events, StatusInfoViewModel statusInfoViewModel,
+            IWindowManager windowManager)
         {
             _productAPIConsumer = productAPIConsumer;
             _saleAPIConsumer = saleAPIConsumer;
             _configHelper = configHelper;
             _events = events;
+            _statusInfo = statusInfoViewModel;
+            _windowManager = windowManager;
             Cart = new BindingList<CartItemModel>();
             _itemQuantity = 1;
         }
 
         protected override async void OnViewLoaded(object view)
         {
-            await LoadProducts();
+            try
+            {
+                await LoadProducts();
+            }
+            catch (Exception e)
+            {
+                dynamic settings = new ExpandoObject();
+                settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                settings.ResizeMode = ResizeMode.NoResize;
+                settings.Title = "System Error";
+
+                if (e.Message.Equals("Unauthorized"))
+                {
+                    _statusInfo.UpdateMessage("Unauthorized Access", "You do not have permission to interact with the Sales Form.");
+                    await _windowManager.ShowDialogAsync(_statusInfo, settings: settings);
+                }
+                else
+                {
+                    _statusInfo.UpdateMessage("Fatal Exception", e.Message);
+                    await _windowManager.ShowDialogAsync(_statusInfo, settings: settings);
+                }
+
+                
+                await TryCloseAsync();
+            }
         }
 
         private async Task LoadProducts()
