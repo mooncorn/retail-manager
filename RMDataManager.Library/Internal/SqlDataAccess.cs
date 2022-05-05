@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
 using Dapper;
+using System.Data.SqlClient;
 
 namespace RMDataManager.Library.Internal.DataAccess
 {
