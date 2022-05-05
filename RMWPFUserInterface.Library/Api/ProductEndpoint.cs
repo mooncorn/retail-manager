@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace RMWPFUserInterface.Library.Api
 {
-    public class ProductAPIConsumer : IProductAPIConsumer
+    public class ProductEndpoint : IProductEndpoint
     {
         private IAPIHelper _apiHelper;
 
-        public ProductAPIConsumer(IAPIHelper apiHelper)
+        public ProductEndpoint(IAPIHelper apiHelper)
         {
             _apiHelper = apiHelper;
         }

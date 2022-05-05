@@ -23,8 +23,8 @@ namespace RMWPFUserInterface.ViewModels
         private StatusInfoViewModel _statusInfo;
         private readonly IWindowManager _windowManager;
         private int _itemQuantity;
-        private IProductAPIConsumer _productAPIConsumer;
-        private ISaleAPIConsumer _saleAPIConsumer;
+        private IProductEndpoint _productEnpoint;
+        private ISaleEndpoint _saleEndpoint;
         private IConfigHelper _configHelper;
         private IEventAggregator _events;
 
@@ -94,12 +94,12 @@ namespace RMWPFUserInterface.ViewModels
 
         public bool CanCheckOut { get { return _cart.Count > 0; } }
 
-        public SalesViewModel(IProductAPIConsumer productAPIConsumer, ISaleAPIConsumer saleAPIConsumer, 
+        public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, 
             IConfigHelper configHelper, IEventAggregator events, StatusInfoViewModel statusInfoViewModel,
             IWindowManager windowManager)
         {
-            _productAPIConsumer = productAPIConsumer;
-            _saleAPIConsumer = saleAPIConsumer;
+            _productEnpoint = productEndpoint;
+            _saleEndpoint = saleEndpoint;
             _configHelper = configHelper;
             _events = events;
             _statusInfo = statusInfoViewModel;
@@ -139,7 +139,7 @@ namespace RMWPFUserInterface.ViewModels
 
         private async Task LoadProducts()
         {
-            Products = new BindingList<ProductModel>(await _productAPIConsumer.GetAll());
+            Products = new BindingList<ProductModel>(await _productEnpoint.GetAll());
         }
 
         public void AddToCart()
@@ -204,7 +204,7 @@ namespace RMWPFUserInterface.ViewModels
                 });
             }
 
-            await _saleAPIConsumer.PostSale(saleModel);
+            await _saleEndpoint.PostSale(saleModel);
             await _events.PublishOnUIThreadAsync(new CheckOutEvent());
         }
 

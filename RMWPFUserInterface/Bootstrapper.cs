@@ -32,8 +32,9 @@ namespace RMWPFUserInterface
             _container.Instance(_container);
 
             _container
-                .PerRequest<IProductAPIConsumer, ProductAPIConsumer>()
-                .PerRequest<ISaleAPIConsumer, SaleAPIConsumer>();
+                .PerRequest<IProductEndpoint, ProductEndpoint>()
+                .PerRequest<ISaleEndpoint, SaleEndpoint>()
+                .PerRequest<IUserEndpoint, UserEndpoint>();
 
             _container
                 .Singleton<IWindowManager, WindowManager>()

@@ -13,7 +13,6 @@ namespace RMWPFUserInterface.ViewModels
 {
     public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>, IHandle<CheckOutEvent>
     {
-        private SalesViewModel _salesViewModel;
         private ILoggedInUserModel _loggedInUser;
         private IEventAggregator _events;
         private IAPIHelper _apiHelper;
@@ -23,9 +22,13 @@ namespace RMWPFUserInterface.ViewModels
             get { return !string.IsNullOrEmpty(_loggedInUser.Token); }
         }
 
-        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, ILoggedInUserModel loggedInUser, IAPIHelper apiHelper)
+        public bool IsNotLoggedIn
         {
-            _salesViewModel = salesVM;
+            get { return string.IsNullOrEmpty(_loggedInUser.Token); }
+        }
+
+        public ShellViewModel(IEventAggregator events, ILoggedInUserModel loggedInUser, IAPIHelper apiHelper)
+        {
             _events = events;
             _loggedInUser = loggedInUser;
             _apiHelper = apiHelper;
@@ -46,12 +49,29 @@ namespace RMWPFUserInterface.ViewModels
             _apiHelper.ClearHeaders();
             await ActivateItemAsync(IoC.Get<LoginViewModel>());
             NotifyOfPropertyChange(() => IsLoggedIn);
+            NotifyOfPropertyChange(() => IsNotLoggedIn);
+        }
+
+        public async void LogIn()
+        {
+            await ActivateItemAsync(IoC.Get<LoginViewModel>());
+        }
+
+        public async void UserManagement()
+        {
+            await ActivateItemAsync(IoC.Get<UserDisplayViewModel>());
+        }
+
+        public async void Sales()
+        {
+            await ActivateItemAsync(IoC.Get<SalesViewModel>());
         }
 
         public async Task HandleAsync(LogOnEvent logOnEvent, CancellationToken cancellationToken)
         {
-            await ActivateItemAsync(_salesViewModel);
+            await ActivateItemAsync(IoC.Get<SalesViewModel>());
             NotifyOfPropertyChange(() => IsLoggedIn);
+            NotifyOfPropertyChange(() => IsNotLoggedIn);
         }
 
         public async Task HandleAsync(CheckOutEvent checkOutEvent, CancellationToken cancellationToken)

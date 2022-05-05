@@ -1,10 +1,11 @@
 ﻿using RMWPFUserInterface.Library.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RMWPFUserInterface.Library.Api
 {
-    public interface ISaleAPIConsumer
+    public interface IProductEndpoint
     {
-        Task PostSale(SaleModel sale);
+        Task<List<ProductModel>> GetAll();
     }
 }
