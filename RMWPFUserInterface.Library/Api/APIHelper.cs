@@ -25,7 +25,8 @@ namespace RMWPFUserInterface.Library.Api
 
         private void InitializeClient()
         {
-            string api = ConfigurationManager.AppSettings.Get("api");
+            string api = "https://localhost:7081/";
+            //string api = ConfigurationManager.AppSettings.Get("api");
 
             _apiClient = new HttpClient();
             _apiClient.BaseAddress = new Uri(api);
@@ -37,12 +38,12 @@ namespace RMWPFUserInterface.Library.Api
         {
             var data = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("grant_type", "password"),
+                //new KeyValuePair<string, string>("grant_type", "password"),
                 new KeyValuePair<string, string>("username", username),
                 new KeyValuePair<string, string>("password", password)
             });
 
-            using (HttpResponseMessage response = await _apiClient.PostAsync("/token", data))
+            using (HttpResponseMessage response = await _apiClient.PostAsync("/api/Token", data))
             {
                 if (response.IsSuccessStatusCode)
                 {

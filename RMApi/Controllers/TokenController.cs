@@ -23,7 +23,7 @@ namespace RMApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string username, string password)
+        public async Task<IActionResult> Create([FromForm] string username, [FromForm] string password)
         {
             if (await IsValidUsernameAndPassword(username, password))
             {
@@ -66,7 +66,7 @@ namespace RMApi.Controllers
             var token = new JwtSecurityToken(
                 new JwtHeader(
                     new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SecretKey")),
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ThisIsMyTemporarySecretKey")),
                         SecurityAlgorithms.HmacSha256)
                     ),
                 new JwtPayload(claims));
