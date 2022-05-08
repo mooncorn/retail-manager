@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using RMDataManager.Library.DataAccess;
 using RMDataManager.Library.Models;
 using System.Security.Claims;
-using TRMDataManager.Library.Models;
 
 namespace RMApi.Controllers
 {

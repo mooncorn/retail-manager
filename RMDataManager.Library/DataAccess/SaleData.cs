@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RMDataManager.Library.Internal.DataAccess;
-using TRMDataManager.Library.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace RMDataManager.Library.DataAccess
@@ -44,7 +43,7 @@ namespace RMDataManager.Library.DataAccess
                 detail.PurchasePrice = productInfo.RetailPrice * detail.Quantity;
 
                 if (productInfo.IsTaxable)
-                    detail.Tax = detail.PurchasePrice * ConfigHelper.TaxRate / 100;
+                    detail.Tax = detail.PurchasePrice * Convert.ToDecimal(_config["taxRate"]) / 100;
 
                 details.Add(detail);
             }
