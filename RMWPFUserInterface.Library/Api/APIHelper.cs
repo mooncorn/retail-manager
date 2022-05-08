@@ -25,8 +25,7 @@ namespace RMWPFUserInterface.Library.Api
 
         private void InitializeClient()
         {
-            string api = "https://localhost:7081/";
-            //string api = ConfigurationManager.AppSettings.Get("api");
+            string api = ConfigurationManager.AppSettings.Get("api");
 
             _apiClient = new HttpClient();
             _apiClient.BaseAddress = new Uri(api);
