@@ -319,12 +319,6 @@
     <Content Include="Scripts\jquery-3.6.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.6.0.min.map" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RMDataManager.Library\RMDataManager.Library.csproj">
-      <Project>{9ECA56CC-90B4-4B0B-B533-7EC01F2A6CC9}</Project>
-      <Name>RMDataManager.Library</Name>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

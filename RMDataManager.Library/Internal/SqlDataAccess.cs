@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Configuration;
 using System.Data;
 using Dapper;
 using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace RMDataManager.Library.Internal.DataAccess
 {
@@ -16,9 +16,16 @@ namespace RMDataManager.Library.Internal.DataAccess
         private IDbTransaction _transaction;
         private bool isClosed;
 
+        private IConfiguration _config;
+
+        public SqlDataAccess(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public string GetConnectionString(string name)
         {
-            return ConfigurationManager.ConnectionStrings[name].ConnectionString;
+            return _config.GetConnectionString(name);
         }
 
         public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)

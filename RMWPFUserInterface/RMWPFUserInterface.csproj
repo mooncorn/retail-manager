@@ -174,12 +174,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RMWPFUserInterface.Library\RMWPFUserInterface.Library.csproj">
-      <Project>{1B9AE7F7-3605-4386-9AF3-796652BE9878}</Project>
-      <Name>RMWPFUserInterface.Library</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
