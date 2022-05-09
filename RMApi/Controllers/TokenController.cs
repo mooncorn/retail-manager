@@ -13,11 +13,13 @@ namespace RMApi.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
+        public readonly IConfiguration _config;
         public readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public TokenController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public TokenController(IConfiguration config, ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
+            _config = config;
             _context = context;
             _userManager = userManager;
         }
@@ -66,7 +68,7 @@ namespace RMApi.Controllers
             var token = new JwtSecurityToken(
                 new JwtHeader(
                     new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ThisIsMyTemporarySecretKey")),
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetValue<string>("Secrets:SecurityKey"))),
                         SecurityAlgorithms.HmacSha256)
                     ),
                 new JwtPayload(claims));
