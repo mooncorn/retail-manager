@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace RMDataManager.Library.Internal.DataAccess
 {
-    internal class SqlDataAccess : IDisposable
+    public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
         private IDbConnection _connection;
         private IDbTransaction _transaction;
@@ -85,21 +85,21 @@ namespace RMDataManager.Library.Internal.DataAccess
                     // TODO: Log this issue
                 }
             }
-                
+
             _transaction = null;
             _connection = null;
         }
 
         public void SaveDataInTransaction<T>(string storedProcedure, T parameters)
         {
-            _connection.Execute(storedProcedure, parameters, 
-                commandType: CommandType.StoredProcedure, 
+            _connection.Execute(storedProcedure, parameters,
+                commandType: CommandType.StoredProcedure,
                 transaction: _transaction);
         }
         public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
         {
-            return _connection.Query<T>(storedProcedure, parameters, 
-                commandType: CommandType.StoredProcedure, 
+            return _connection.Query<T>(storedProcedure, parameters,
+                commandType: CommandType.StoredProcedure,
                 transaction: _transaction).ToList();
         }
     }

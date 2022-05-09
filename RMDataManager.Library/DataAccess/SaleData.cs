@@ -9,20 +9,23 @@ using Microsoft.Extensions.Configuration;
 
 namespace RMDataManager.Library.DataAccess
 {
-    public class SaleData
+    public class SaleData : ISaleData
     {
-        private IConfiguration _config;
+        private readonly IConfiguration _configuration;
+        private ISqlDataAccess _sqlDataAccess;
+        private IProductData _productData;
 
-        public SaleData(IConfiguration config)
+        public SaleData(IConfiguration configuration, ISqlDataAccess sqlDataAccess, IProductData productData)
         {
-            _config = config;
+            _configuration = configuration;
+            _sqlDataAccess = sqlDataAccess;
+            _productData = productData;
         }
 
         public void SaveSale(SaleModel saleInfo, string userId)
         {
             // TODO: Make this better please
 
-            ProductData productData = new ProductData(_config);
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
 
             foreach (SaleDetailModel item in saleInfo.SaleDetails)
@@ -34,7 +37,7 @@ namespace RMDataManager.Library.DataAccess
                 };
 
                 // Get information about current product
-                var productInfo = productData.GetById(detail.ProductId);
+                var productInfo = _productData.GetById(detail.ProductId);
 
                 if (productInfo == null)
                     throw new Exception($"The product Id of {detail.ProductId} could not be found in the database.");
@@ -43,7 +46,7 @@ namespace RMDataManager.Library.DataAccess
                 detail.PurchasePrice = productInfo.RetailPrice * detail.Quantity;
 
                 if (productInfo.IsTaxable)
-                    detail.Tax = detail.PurchasePrice * Convert.ToDecimal(_config["taxRate"]) / 100;
+                    detail.Tax = detail.PurchasePrice * Convert.ToDecimal(_configuration["taxRate"]) / 100;
 
                 details.Add(detail);
             }
@@ -58,18 +61,18 @@ namespace RMDataManager.Library.DataAccess
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            using (SqlDataAccess sqlDataAccess = new SqlDataAccess(_config))
+            using (SqlDataAccess dataAccess = new SqlDataAccess(_configuration))
             {
                 try
                 {
-                    sqlDataAccess.StartTransaction("RMData");
+                    dataAccess.StartTransaction("RMData");
 
                     // Save the sale model
-                    sqlDataAccess.SaveDataInTransaction("spSale_Insert", sale);
+                    dataAccess.SaveDataInTransaction("spSale_Insert", sale);
 
                     // Get the id of inserted sale
                     var parameters = new { sale.SellerId, sale.SaleDate };
-                    sale.Id = sqlDataAccess.LoadDataInTransaction<int, dynamic>("spSale_Lookup", parameters).FirstOrDefault();
+                    sale.Id = dataAccess.LoadDataInTransaction<int, dynamic>("spSale_Lookup", parameters).FirstOrDefault();
 
                     // Finish filling in the sale detail models
                     foreach (SaleDetailDBModel detail in details)
@@ -77,12 +80,12 @@ namespace RMDataManager.Library.DataAccess
                         detail.SaleId = sale.Id;
 
                         // Save the detail models
-                        sqlDataAccess.SaveDataInTransaction("spSaleDetail_Insert", detail);
+                        dataAccess.SaveDataInTransaction("spSaleDetail_Insert", detail);
                     }
                 }
                 catch
                 {
-                    sqlDataAccess.RollbackTransaction();
+                    dataAccess.RollbackTransaction();
                     throw; // throw original exception
                 }
             }
@@ -90,8 +93,7 @@ namespace RMDataManager.Library.DataAccess
 
         public List<SaleReportModel> GetSaleReport()
         {
-            SqlDataAccess sqlDataAccess = new SqlDataAccess(_config);
-            return sqlDataAccess.LoadData<SaleReportModel, dynamic>("spSale_SaleReport", null, "RMData");
+            return _sqlDataAccess.LoadData<SaleReportModel, dynamic>("spSale_SaleReport", null, "RMData");
         }
     }
 }

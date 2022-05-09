@@ -11,19 +11,18 @@ namespace RMApi.Controllers
     [Authorize(Roles = "Cashier")]
     public class ProductController : ControllerBase
     {
-        private IConfiguration _config;
+        private IProductData _productData;
 
-        public ProductController(IConfiguration config)
+        public ProductController(IProductData productData)
         {
-            _config = config;
+            _productData = productData;
         }
 
         [HttpGet]
         [Route("All")]
         public List<ProductDBModel> GetAll()
         {
-            ProductData productData = new ProductData(_config);
-            return productData.GetAll();
+            return _productData.GetAll();
         }
     }
 }

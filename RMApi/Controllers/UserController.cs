@@ -16,23 +16,22 @@ namespace RMApi.Controllers
     [Authorize]
     public class UserController : ControllerBase
     {
-        private readonly IConfiguration _config;
+        private IUserData _userData;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public UserController(IConfiguration config, ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData userData)
         {
-            _config = config;
             _context = context;
             _userManager = userManager;
+            _userData = userData;
         }
 
         [HttpGet]
         public UserDBModel GetById()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            UserData data = new UserData(_config);
-            return data.GetUserById(userId);
+            return _userData.GetUserById(userId);
         }
 
         [Authorize(Roles = "Admin")]

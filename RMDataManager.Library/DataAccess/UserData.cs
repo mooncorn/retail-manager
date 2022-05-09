@@ -9,22 +9,18 @@ using RMDataManager.Library.Models;
 
 namespace RMDataManager.Library.DataAccess
 {
-    public class UserData
+    public class UserData : IUserData
     {
-        private IConfiguration _config;
+        private ISqlDataAccess _sqlDataAccess;
 
-        public UserData(IConfiguration config)
+        public UserData(ISqlDataAccess sqlDataAccess)
         {
-            _config = config;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public UserDBModel GetUserById(string Id)
         {
-            SqlDataAccess sqlDataAccess = new SqlDataAccess(_config);
-
-            var parameters = new { Id = Id };
-
-            return sqlDataAccess.LoadData<UserDBModel, dynamic>("dbo.spUserLookup", parameters, "RMData").First();
+            return _sqlDataAccess.LoadData<UserDBModel, dynamic>("dbo.spUserLookup", new { Id }, "RMData").First();
         }
     }
 }

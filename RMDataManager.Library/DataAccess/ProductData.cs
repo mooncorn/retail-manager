@@ -3,31 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using RMDataManager.Library.Internal.DataAccess;
 using RMDataManager.Library.Models;
 
 namespace RMDataManager.Library.DataAccess
 {
-    public class ProductData
+    public class ProductData : IProductData
     {
-        private IConfiguration _config;
+        private ISqlDataAccess _sqlDataAccess;
 
-        public ProductData(IConfiguration config)
+        public ProductData(ISqlDataAccess sqlDataAccess)
         {
-            _config = config;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public List<ProductDBModel> GetAll()
         {
-            SqlDataAccess sqlDataAccess = new SqlDataAccess(_config);
-            return sqlDataAccess.LoadData<ProductDBModel, dynamic>("spProduct_GetAll", null, "RMData");
+            return _sqlDataAccess.LoadData<ProductDBModel, dynamic>("spProduct_GetAll", new { }, "RMData");
         }
 
         public ProductDBModel GetById(int id)
         {
-            SqlDataAccess sqlDataAccess = new SqlDataAccess(_config);
-            return sqlDataAccess.LoadData<ProductDBModel, dynamic>("spProduct_GetById", new {Id = id}, "RMData").FirstOrDefault();
+            return _sqlDataAccess.LoadData<ProductDBModel, dynamic>("spProduct_GetById", new { Id = id }, "RMData").FirstOrDefault();
         }
     }
 }
