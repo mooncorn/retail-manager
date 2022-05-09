@@ -5,17 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RMDataManager.Library.Internal.DataAccess;
-using TRMDataManager.Library.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace RMDataManager.Library.DataAccess
 {
     public class SaleData
     {
+        private IConfiguration _config;
+
+        public SaleData(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public void SaveSale(SaleModel saleInfo, string userId)
         {
             // TODO: Make this better please
 
-            ProductData productData = new ProductData();
+            ProductData productData = new ProductData(_config);
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
 
             foreach (SaleDetailModel item in saleInfo.SaleDetails)
@@ -36,7 +43,7 @@ namespace RMDataManager.Library.DataAccess
                 detail.PurchasePrice = productInfo.RetailPrice * detail.Quantity;
 
                 if (productInfo.IsTaxable)
-                    detail.Tax = detail.PurchasePrice * ConfigHelper.TaxRate / 100;
+                    detail.Tax = detail.PurchasePrice * Convert.ToDecimal(_config["taxRate"]) / 100;
 
                 details.Add(detail);
             }
@@ -51,7 +58,7 @@ namespace RMDataManager.Library.DataAccess
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            using (SqlDataAccess sqlDataAccess = new SqlDataAccess())
+            using (SqlDataAccess sqlDataAccess = new SqlDataAccess(_config))
             {
                 try
                 {
@@ -83,7 +90,7 @@ namespace RMDataManager.Library.DataAccess
 
         public List<SaleReportModel> GetSaleReport()
         {
-            SqlDataAccess sqlDataAccess = new SqlDataAccess();
+            SqlDataAccess sqlDataAccess = new SqlDataAccess(_config);
             return sqlDataAccess.LoadData<SaleReportModel, dynamic>("spSale_SaleReport", null, "RMData");
         }
     }

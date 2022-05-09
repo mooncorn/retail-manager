@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Configuration;
 using RMWPFUserInterface.Library.Models;
+using System.Configuration;
 
 namespace RMWPFUserInterface.Library.Api
 {
@@ -37,12 +37,12 @@ namespace RMWPFUserInterface.Library.Api
         {
             var data = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("grant_type", "password"),
+                //new KeyValuePair<string, string>("grant_type", "password"),
                 new KeyValuePair<string, string>("username", username),
                 new KeyValuePair<string, string>("password", password)
             });
 
-            using (HttpResponseMessage response = await _apiClient.PostAsync("/token", data))
+            using (HttpResponseMessage response = await _apiClient.PostAsync("/api/Token", data))
             {
                 if (response.IsSuccessStatusCode)
                 {
