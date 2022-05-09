@@ -61,33 +61,32 @@ namespace RMDataManager.Library.DataAccess
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            using (SqlDataAccess dataAccess = new SqlDataAccess(_configuration))
+            try
             {
-                try
+                _sqlDataAccess.StartTransaction("RMData");
+
+                // Save the sale model
+                _sqlDataAccess.SaveDataInTransaction("spSale_Insert", sale);
+
+                // Get the id of inserted sale
+                var parameters = new { sale.SellerId, sale.SaleDate };
+                sale.Id = _sqlDataAccess.LoadDataInTransaction<int, dynamic>("spSale_Lookup", parameters).FirstOrDefault();
+
+                // Finish filling in the sale detail models
+                foreach (SaleDetailDBModel detail in details)
                 {
-                    dataAccess.StartTransaction("RMData");
+                    detail.SaleId = sale.Id;
 
-                    // Save the sale model
-                    dataAccess.SaveDataInTransaction("spSale_Insert", sale);
-
-                    // Get the id of inserted sale
-                    var parameters = new { sale.SellerId, sale.SaleDate };
-                    sale.Id = dataAccess.LoadDataInTransaction<int, dynamic>("spSale_Lookup", parameters).FirstOrDefault();
-
-                    // Finish filling in the sale detail models
-                    foreach (SaleDetailDBModel detail in details)
-                    {
-                        detail.SaleId = sale.Id;
-
-                        // Save the detail models
-                        dataAccess.SaveDataInTransaction("spSaleDetail_Insert", detail);
-                    }
+                    // Save the detail models
+                    _sqlDataAccess.SaveDataInTransaction("spSaleDetail_Insert", detail);
                 }
-                catch
-                {
-                    dataAccess.RollbackTransaction();
-                    throw; // throw original exception
-                }
+
+                _sqlDataAccess.CommitTransaction();
+            }
+            catch
+            {
+                _sqlDataAccess.RollbackTransaction();
+                throw; // throw original exception
             }
         }
 

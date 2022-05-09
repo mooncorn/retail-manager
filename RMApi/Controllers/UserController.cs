@@ -17,11 +17,13 @@ namespace RMApi.Controllers
     public class UserController : ControllerBase
     {
         private IUserData _userData;
+        private readonly ILogger<UserController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData userData)
+        public UserController(ILogger<UserController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData userData)
         {
+            _logger = logger;
             _context = context;
             _userManager = userManager;
             _userData = userData;
@@ -76,7 +78,13 @@ namespace RMApi.Controllers
         [Route("Admin/AssignRole")]
         public async Task AssignRole(UserRolePairModel userRolePair)
         {
+            string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             IdentityUser user = await _userManager.FindByIdAsync(userRolePair.UserId);
+
+            _logger.LogInformation("Admin {Admin} added user {User} to role {Role}",
+                loggedInUserId, user.Id, userRolePair.RoleName);
+
             await _userManager.AddToRoleAsync(user, userRolePair.RoleName);
         }
 
@@ -85,7 +93,13 @@ namespace RMApi.Controllers
         [Route("Admin/UnassignRole")]
         public async Task UnassignRole(UserRolePairModel userRolePair)
         {
+            string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             IdentityUser user = await _userManager.FindByIdAsync(userRolePair.UserId);
+
+            _logger.LogInformation("Admin {Admin} removed user {User} from role {Role}",
+                loggedInUserId, user.Id, userRolePair.RoleName);
+
             await _userManager.RemoveFromRoleAsync(user, userRolePair.RoleName);
         }
     }

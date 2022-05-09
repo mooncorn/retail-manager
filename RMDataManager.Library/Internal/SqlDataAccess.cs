@@ -7,20 +7,23 @@ using System.Data;
 using Dapper;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace RMDataManager.Library.Internal.DataAccess
 {
     public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
         private IDbConnection _connection;
+        ILogger<SqlDataAccess> _logger;
         private IDbTransaction _transaction;
         private bool isClosed;
 
         private IConfiguration _config;
 
-        public SqlDataAccess(IConfiguration config)
+        public SqlDataAccess(IConfiguration config, ILogger<SqlDataAccess> logger)
         {
             _config = config;
+            _logger = logger;
         }
 
         public string GetConnectionString(string name)
@@ -80,9 +83,9 @@ namespace RMDataManager.Library.Internal.DataAccess
                 {
                     CommitTransaction();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // TODO: Log this issue
+                    _logger.LogError("Commit transaction failed in the dispose method.", ex);
                 }
             }
 
