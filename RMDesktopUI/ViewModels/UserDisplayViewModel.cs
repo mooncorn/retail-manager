@@ -14,61 +14,22 @@ namespace RMDesktopUI.ViewModels
 {
     public class UserDisplayViewModel : Screen
     {
-        private BindingList<UserModel> _users;
+        
         private readonly IUserEndpoint _userEndpoint;
+
         private readonly IWindowManager _windowManager;
         private readonly StatusInfoViewModel _statusInfo;
-        private UserModel _selectedUser;
-        private string _selectedUserName;
-        private string _selectedRoleToRemove;
-        private string _selectedRoleToAdd;
-        private BindingList<string> _selectedUserRoles = new BindingList<string>();
-        private BindingList<string> _availableRoles = new BindingList<string>();
+
+        private UserModel? _selectedUser;
+        private string? _selectedUserName;
+        private string? _selectedRoleToUnassign;
+        private string? _selectedRoleToAssign;
+
+        private BindingList<UserModel> _users;
         private Dictionary<string, string> _roles;
 
-        public BindingList<string> SelectedUserRoles
-        {
-            get { return _selectedUserRoles; }
-            set
-            {
-                _selectedUserRoles = value;
-                NotifyOfPropertyChange(() => SelectedUserRoles);
-            }
-        }
-
-        public BindingList<string> AvailableRoles
-        {
-            get { return _availableRoles; }
-            set
-            {
-                _availableRoles = value;
-                NotifyOfPropertyChange(() => AvailableRoles);
-            }
-        }
-
-        public UserModel SelectedUser
-        {
-            get { return _selectedUser; }
-            set
-            {
-                _selectedUser = value;
-                SelectedUserName = _selectedUser.Email;
-                SelectedUserRoles.Clear();
-                SelectedUserRoles = new BindingList<string>(_selectedUser.Roles.Select(role => role.Value).ToList());
-                UpdateAvailableRoles();
-                NotifyOfPropertyChange(() => SelectedUser);
-            }
-        }
-
-        public string SelectedUserName
-        {
-            get { return _selectedUserName; }
-            set
-            {
-                _selectedUserName = value;
-                NotifyOfPropertyChange(() => SelectedUserName);
-            }
-        }
+        private BindingList<string> _assignedRoles;
+        private BindingList<string> _unassignedRoles;
 
         public BindingList<UserModel> Users
         {
@@ -80,29 +41,93 @@ namespace RMDesktopUI.ViewModels
             }
         }
 
-        public string SelectedRoleToRemove
+        public BindingList<string> AssignedRoles
         {
-            get { return _selectedRoleToRemove; }
+            get { return _assignedRoles; }
             set
             {
-                _selectedRoleToRemove = value;
-                NotifyOfPropertyChange(() => SelectedRoleToRemove);
+                _assignedRoles = value;
+                NotifyOfPropertyChange(() => AssignedRoles);
+            }
+        }
+        public BindingList<string> UnassignedRoles
+        {
+            get { return _unassignedRoles; }
+            set
+            {
+                _unassignedRoles = value;
+                NotifyOfPropertyChange(() => UnassignedRoles);
             }
         }
 
-        public string SelectedRoleToAdd
+        public UserModel? SelectedUser
         {
-            get { return _selectedRoleToAdd; }
+            get { return _selectedUser; }
             set
             {
-                _selectedRoleToAdd = value;
-                NotifyOfPropertyChange(() => SelectedRoleToAdd);
+                _selectedUser = value;
+
+                UpdateAssignedRoles();
+                UpdateUnassignedRoles();
+                NotifyOfPropertyChange(() => SelectedUser);
+            }
+        }
+        public string? SelectedUserName
+        {
+            get { return _selectedUserName; }
+            set
+            {
+                _selectedUserName = value;
+                NotifyOfPropertyChange(() => SelectedUserName);
+            }
+        }
+        public string? SelectedRoleToUnassign
+        {
+            get { return _selectedRoleToUnassign; }
+            set
+            {
+                _selectedRoleToUnassign = value;
+                NotifyOfPropertyChange(() => SelectedRoleToUnassign);
+                NotifyOfPropertyChange(() => CanUnassignSelectedRole);
+            }
+        }
+        public string? SelectedRoleToAssign
+        {
+            get { return _selectedRoleToAssign; }
+            set
+            {
+                _selectedRoleToAssign = value;
+                NotifyOfPropertyChange(() => SelectedRoleToAssign);
+                NotifyOfPropertyChange(() => CanAssignSelectedRole);
             }
         }
 
-        public UserDisplayViewModel(IUserEndpoint userEnpoint, StatusInfoViewModel statusInfoViewModel,
-            IWindowManager windowManager)
+        public bool CanAssignSelectedRole
         {
+            get
+            {
+                return _selectedUser != null && _selectedRoleToAssign != null;
+            }
+        }
+
+        public bool CanUnassignSelectedRole
+        {
+            get
+            {
+                return _selectedUser != null && _selectedRoleToUnassign != null;
+            }
+        }
+
+        public UserDisplayViewModel(IUserEndpoint userEnpoint,
+                                    StatusInfoViewModel statusInfoViewModel,
+                                    IWindowManager windowManager)
+        {
+            _users = new BindingList<UserModel>();
+            _roles = new Dictionary<string, string>();
+
+            _assignedRoles = new BindingList<string>();
+            _unassignedRoles = new BindingList<string>();
+
             _userEndpoint = userEnpoint;
             _statusInfo = statusInfoViewModel;
             _windowManager = windowManager;
@@ -133,7 +158,6 @@ namespace RMDesktopUI.ViewModels
                     await _windowManager.ShowDialogAsync(_statusInfo, settings: settings);
                 }
 
-
                 await TryCloseAsync();
             }
         }
@@ -148,46 +172,78 @@ namespace RMDesktopUI.ViewModels
             _roles = await _userEndpoint.GetAllRoles();
         }
 
-        private void UpdateAvailableRoles()
+        /// <summary>
+        /// Clear the list of unassigned roles and fill the binding list with roles that do not belong to currently selected user.
+        /// This will compile a list of unassigned roles based on currently assigned roles. 
+        /// </summary>
+        private void UpdateUnassignedRoles()
         {
-            AvailableRoles.Clear();
+            UnassignedRoles.Clear();
+
             foreach (var role in _roles)
             {
-                if (SelectedUserRoles.IndexOf(role.Value) == -1)
+                if (AssignedRoles.IndexOf(role.Value) == -1)
                 {
-                    AvailableRoles.Add(role.Value);
+                    UnassignedRoles.Add(role.Value);
                 }
             }
         }
 
-        public async void RemoveSelectedRole()
+        /// <summary>
+        /// Clear the list of assigned roles and override the binding list with roles that belong to currently selected user.
+        /// </summary>
+        private void UpdateAssignedRoles()
         {
-            try
-            {
-                await _userEndpoint.UnassignRole(_selectedUser.Id, SelectedRoleToRemove);
+            AssignedRoles.Clear();
 
-                AvailableRoles.Add(SelectedRoleToRemove);
-                SelectedUserRoles.Remove(SelectedRoleToRemove);
-            }
-            catch (Exception ex)
+            if (_selectedUser != null)
             {
-                throw;
+                SelectedUserName = _selectedUser.Email;
+                AssignedRoles = new BindingList<string>(_selectedUser.Roles.Select(role => role.Value).ToList());
+            }
+            else
+            {
+                SelectedUserName = string.Empty;
             }
         }
 
-        public async void AddSelectedRole()
+        /// <summary>
+        /// Unassign role from selected user and update the binding lists
+        /// </summary>
+        public async void UnassignSelectedRole()
         {
-            try
+            if (_selectedUser != null && _selectedRoleToUnassign != null)
             {
-                await _userEndpoint.AssignRole(_selectedUser.Id, SelectedRoleToAdd);
+                await _userEndpoint.UnassignRole(_selectedUser.Id, SelectedRoleToUnassign);
 
-                SelectedUserRoles.Add(SelectedRoleToAdd);
-                AvailableRoles.Remove(SelectedRoleToAdd);
+                UnassignedRoles.Add(_selectedRoleToUnassign);
+
+                // Update users list by removing _selectedRoleToUnssign from selected user
+                var roleKeyToRemove = _roles.Where(keyValuePair => keyValuePair.Value == _selectedRoleToUnassign).FirstOrDefault().Key;
+                _selectedUser.Roles.Remove(roleKeyToRemove);
+                _users.ResetBindings();
+
+                AssignedRoles.Remove(_selectedRoleToUnassign);
             }
-            catch (Exception ex)
-            {
+        }
 
-                throw;
+        /// <summary>
+        /// Assign role to selected user and update the binding lists
+        /// </summary>
+        public async void AssignSelectedRole()
+        {
+            if (_selectedUser != null && _selectedRoleToAssign != null)
+            {
+                await _userEndpoint.AssignRole(_selectedUser.Id, SelectedRoleToAssign);
+
+                AssignedRoles.Add(_selectedRoleToAssign);
+
+                // Update users list by adding _selectedRoleToAssign to selected user
+                var roleToAdd = _roles.Where(keyValuePair => keyValuePair.Value == _selectedRoleToAssign).FirstOrDefault();
+                _selectedUser.Roles.Add(roleToAdd.Key, roleToAdd.Value);
+                _users.ResetBindings();
+
+                UnassignedRoles.Remove(_selectedRoleToAssign);
             }
         }
     }
