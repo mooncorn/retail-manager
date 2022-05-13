@@ -22,6 +22,11 @@ namespace RMDataManager.Library.DataAccess
             _productData = productData;
         }
 
+        public decimal GetTaxRate()
+        {
+            return Convert.ToDecimal(_configuration["TaxRate"]) / 100;
+        }
+
         public void SaveSale(SaleModel saleInfo, string userId)
         {
             // TODO: Make this better please
@@ -46,7 +51,7 @@ namespace RMDataManager.Library.DataAccess
                 detail.PurchasePrice = productInfo.RetailPrice * detail.Quantity;
 
                 if (productInfo.IsTaxable)
-                    detail.Tax = detail.PurchasePrice * Convert.ToDecimal(_configuration["taxRate"]) / 100;
+                    detail.Tax = detail.PurchasePrice * GetTaxRate();
 
                 details.Add(detail);
             }
