@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using RMWPFUserInterface.Library.Models;
-using System.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace RMWPFUserInterface.Library.Api
 {
@@ -14,18 +14,20 @@ namespace RMWPFUserInterface.Library.Api
     {
         private HttpClient _apiClient;
         private ILoggedInUserModel _loggedInUser;
+        private IConfiguration _config;
 
         public HttpClient ApiClient { get { return _apiClient; } }
 
-        public APIHelper(ILoggedInUserModel loggedInUserModel)
+        public APIHelper(ILoggedInUserModel loggedInUserModel, IConfiguration config)
         {
-            InitializeClient();
             _loggedInUser = loggedInUserModel;
+            _config = config;
+            InitializeClient();
         }
 
         private void InitializeClient()
         {
-            string api = ConfigurationManager.AppSettings.Get("api");
+            string api = _config.GetValue<string>("Api");
 
             _apiClient = new HttpClient();
             _apiClient.BaseAddress = new Uri(api);

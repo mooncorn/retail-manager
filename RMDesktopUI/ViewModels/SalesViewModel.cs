@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using Microsoft.Extensions.Configuration;
 using RMDesktopUI.EventModels;
 using RMDesktopUI.Helpers;
 using RMWPFUserInterface.Library.Api;
@@ -25,7 +26,7 @@ namespace RMDesktopUI.ViewModels
         private int _itemQuantity;
         private IProductEndpoint _productEnpoint;
         private ISaleEndpoint _saleEndpoint;
-        private IConfigHelper _configHelper;
+        private IConfiguration _config;
         private IEventAggregator _events;
 
         public BindingList<ProductModel> Products
@@ -95,12 +96,12 @@ namespace RMDesktopUI.ViewModels
         public bool CanCheckOut { get { return _cart.Count > 0; } }
 
         public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint,
-            IConfigHelper configHelper, IEventAggregator events, StatusInfoViewModel statusInfoViewModel,
+            IConfiguration config, IEventAggregator events, StatusInfoViewModel statusInfoViewModel,
             IWindowManager windowManager)
         {
             _productEnpoint = productEndpoint;
             _saleEndpoint = saleEndpoint;
-            _configHelper = configHelper;
+            _config = config;
             _events = events;
             _statusInfo = statusInfoViewModel;
             _windowManager = windowManager;
@@ -215,7 +216,7 @@ namespace RMDesktopUI.ViewModels
 
         public decimal CalculateTaxAmount()
         {
-            decimal taxRate = Convert.ToDecimal(_configHelper.TaxRate) / 100;
+            decimal taxRate = _config.GetValue<decimal>("TaxRate") / 100;
 
             return Cart
                 .Where((cartItem) => cartItem.Product.IsTaxable)
