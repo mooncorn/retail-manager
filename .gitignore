@@ -398,4 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # API Developer JSON File
-RMData/appsettings.Delevopment.json
+RMApi/appsettings.Delevopment.json
