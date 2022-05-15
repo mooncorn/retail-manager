@@ -13,6 +13,16 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 var secretKey = builder.Configuration.GetValue<string>("Secrets:SecurityKey");
 
 // Add services to the container.
+builder.Services.AddCors(policy =>
+{
+    policy.AddPolicy("OpenCorsPolicy", options =>
+    {
+        options.AllowAnyHeader();
+        options.AllowAnyOrigin();
+        options.AllowAnyMethod();
+    });
+});
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -76,6 +86,7 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseCors("OpenCorsPolicy");
 app.UseStaticFiles();
 
 app.UseRouting();
