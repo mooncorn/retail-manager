@@ -1,0 +1,44 @@
+﻿@inject IAuthenticationService authService
+@inject NavigationManager navigationManager
+
+<EditForm Model="authModel" OnValidSubmit="ExecuteLogin">
+    <div class="row">
+        <div class="col-auto">
+            <InputText class="form-control" aria-label="Email" @bind-Value="authModel.Email" placeholder="Email Address"/>
+            <ValidationMessage For="@(()=> authModel.Email)"/>
+        </div>
+
+
+        <div class="col-auto">
+            <InputText type="password" aria-label="Password" class="form-control" @bind-Value="authModel.Password" placeholder="Password"/>
+            <ValidationMessage For="@(()=> authModel.Email)"/>
+        </div>
+
+        <div class="col-auto">
+            <button type="submit" class="btn btn-success">Log In</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private AuthenticationUserModel authModel = new();
+
+    private bool showAuthenticationError = false;
+    private string errorMessage = string.Empty;
+
+    private async Task ExecuteLogin()
+    {
+        showAuthenticationError = false;
+        errorMessage = string.Empty;
+
+        var result = await authService.Login(authModel);
+
+        if (result != null)
+            navigationManager.NavigateTo("/");
+        else
+        {
+            errorMessage = "There was an error when trying to log in.";
+            showAuthenticationError = true;
+        }
+    }
+}
