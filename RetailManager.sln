@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RMDesktopUI", "RMDesktopUI\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApps", "WebApps", "{0F04641A-AA5B-45E6-B50C-2F7A63E5CB2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal", "Portal\Portal.csproj", "{DD243D87-71E1-41CF-AFA0-EE8D3663A428}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal", "Portal\Portal.csproj", "{DD243D87-71E1-41CF-AFA0-EE8D3663A428}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

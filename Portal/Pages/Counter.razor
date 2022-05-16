@@ -1,4 +1,14 @@
 ﻿@page "/counter"
+@using Portal.Authentication;
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        The user (@context.User.Identity.Name) is authenticated
+    </Authorized>
+    <NotAuthorized>
+         The user is not authenticated
+    </NotAuthorized>
+</AuthorizeView>
 
 <PageTitle>Counter</PageTitle>
 
