@@ -20,7 +20,12 @@ namespace RMDataManager.Library.DataAccess
 
         public UserDBModel GetUserById(string Id)
         {
-            return _sqlDataAccess.LoadData<UserDBModel, dynamic>("dbo.spUserLookup", new { Id }, "RMData").First();
+            return _sqlDataAccess.LoadData<UserDBModel, dynamic>("dbo.spUser_Lookup", new { Id }, "RMData").First();
+        }
+
+        public void CreateUser(UserDBModel user)
+        {
+            _sqlDataAccess.SaveData("dbo.spUser_Insert", new { user.Id, user.FirstName, user.LastName, user.EmailAddress }, "RMData");
         }
     }
 }

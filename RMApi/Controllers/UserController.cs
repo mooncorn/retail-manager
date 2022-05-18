@@ -29,6 +29,55 @@ namespace RMApi.Controllers
             _userData = userData;
         }
 
+        // TODO: Use Model Validation
+        public record UserRegistrationModel(string FirstName, string LastName, string Email, string Password);
+
+        [HttpPost]
+        [Route("Register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(UserRegistrationModel userInfo)
+        {
+            if (ModelState.IsValid)
+            {
+                var existingUser = await _userManager.FindByEmailAsync(userInfo.Email);
+
+                if (existingUser != null)
+                    return BadRequest("An account with this email address already exists.");
+
+                IdentityUser newUser = new()
+                {
+                    Email = userInfo.Email,
+                    EmailConfirmed = true, // TODO: Send an email to confirm account
+                    UserName = userInfo.Email
+                };
+
+                IdentityResult result = await _userManager.CreateAsync(newUser, userInfo.Password);
+
+                if (result.Succeeded)
+                {
+                    var createdUserIdentity = await _userManager.FindByEmailAsync(userInfo.Email);
+
+                    if (createdUserIdentity == null)
+                        return BadRequest();
+
+                    UserDBModel userModel = new()
+                    {
+                        Id = createdUserIdentity.Id,
+                        FirstName = userInfo.FirstName,
+                        LastName = userInfo.LastName,
+                        EmailAddress = createdUserIdentity.Email
+                    };
+
+                    _userData.CreateUser(userModel);
+
+                    return Ok();
+                }
+                    
+            }
+
+            return BadRequest();
+        }
+
         [HttpGet]
         public UserDBModel GetById()
         {
