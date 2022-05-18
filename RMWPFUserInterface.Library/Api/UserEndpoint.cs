@@ -17,6 +17,19 @@ namespace RMWPFUserInterface.Library.Api
             _apiHelper = apiHelper;
         }
 
+        public async Task CreateUser(CreateUserModel newUser)
+        {
+            var data = new { newUser.FirstName, newUser.LastName, Email = newUser.EmailAddress, newUser.Password }; // no need to send confirm password
+
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Register", data))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
         public async Task<List<UserModel>> GetAll()
         {
             using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/User/Admin/GetAll"))

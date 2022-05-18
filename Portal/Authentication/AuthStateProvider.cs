@@ -12,7 +12,7 @@ namespace Portal.Authentication
         private readonly IConfiguration _config;
         private readonly AuthenticationState _anonymous;
 
-        private string TokenKeyName => _config["LocalStorage:KeyNames:AuthToken"];
+        private string TokenKeyName => _config["authToken"];
 
         public AuthStateProvider(HttpClient httpClient,
                                  ILocalStorageService localStorageService,

@@ -13,7 +13,7 @@ namespace Portal.Authentication
         private readonly ILocalStorageService _localStorageService;
         private readonly IConfiguration _config;
 
-        private string TokenKeyName => _config["LocalStorage:KeyNames:AuthToken"];
+        private string TokenKeyName => _config["authToken"];
 
         public AuthenticationService(HttpClient httpClient,
                                     AuthenticationStateProvider authStateProvider,
@@ -25,7 +25,7 @@ namespace Portal.Authentication
             _localStorageService = localStorageService;
             _config = config;
 
-            _httpClient.BaseAddress = new Uri(_config["Api:BaseUrl"]);
+            _httpClient.BaseAddress = new Uri(_config["api"]);
         }
 
         public async Task<AuthenticatedUserModel> Login(AuthenticationUserModel credentials)
@@ -36,7 +36,7 @@ namespace Portal.Authentication
                 new KeyValuePair<string, string>("username", credentials.Email)
             });
 
-            var authResult = await _httpClient.PostAsync(_config["Api:Endpoints:Token"], data);
+            var authResult = await _httpClient.PostAsync(_config["tokenEndpoint"], data);
             var authContent = await authResult.Content.ReadAsStringAsync();
 
             if (!authResult.IsSuccessStatusCode)

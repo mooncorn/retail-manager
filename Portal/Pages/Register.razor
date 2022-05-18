@@ -1,0 +1,75 @@
+﻿@page "/register"
+@inject IUserEndpoint UserEnpoint
+@inject IAuthenticationService AuthService
+@inject NavigationManager NavigationManager
+
+<h3>Create an account</h3>
+
+<EditForm Model="createUser" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator/>
+    @*<ValidationSummary/>*@
+
+    <div hidden="@ShowErrorMessage" class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <label for="FirstName" class="form-label">First name</label>
+            <InputText id="FirstName" @bind-Value="createUser.FirstName" type="text" class="form-control" />
+            <ValidationMessage For="@(() => createUser.FirstName)"/>
+        </div>
+        <div class="col">
+            <label for="LastName" class="form-label">Last name</label>
+            <InputText id="LastName" @bind-Value="createUser.LastName" type="text" class="form-control" />
+            <ValidationMessage For="@(() => createUser.LastName)"/>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="EmailAddress" class="form-label">Email address</label>
+        <InputText type="text" class="form-control" id="EmailAddress" @bind-Value="createUser.EmailAddress" />
+        <ValidationMessage For="@(() => createUser.EmailAddress)"/>
+    </div>
+
+    <div class="mb-3">
+      <label for="Password" class="form-label">Password</label>
+      <InputText type="password" class="form-control" id="Password" @bind-Value="createUser.Password" />
+      <ValidationMessage For="@(() => createUser.Password)"/>
+    </div>
+
+    <div class="mb-3">
+      <label for="ConfirmPassword" class="form-label">Confirm password</label>
+      <InputText type="password" class="form-control" id="ConfirmPassword" @bind-Value="createUser.ConfirmPassword" />
+      <ValidationMessage For="@(() => createUser.ConfirmPassword)"/>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Submit</button>
+</EditForm>
+
+@code {
+    public CreateUserModel createUser = new();
+    public string errorMessage = string.Empty;
+    public bool ShowErrorMessage => string.IsNullOrWhiteSpace(errorMessage);
+
+    public async Task OnValidSubmit()
+    {
+        errorMessage = string.Empty;
+
+        try
+        {
+            await UserEnpoint.CreateUser(createUser);
+
+            var result = await AuthService.Login(new AuthenticationUserModel{ Email = createUser.EmailAddress, Password = createUser.Password });
+
+            if (result != null)
+                NavigationManager.NavigateTo("/");
+            else
+                errorMessage = "The registration was successful but there was an error when trying to log in.";
+        } 
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}

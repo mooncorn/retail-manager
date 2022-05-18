@@ -1,5 +1,5 @@
-﻿@inject IAuthenticationService authService
-@inject NavigationManager navigationManager
+﻿@inject IAuthenticationService AuthService
+@inject NavigationManager NavigationManager
 
 <EditForm Model="authModel" OnValidSubmit="ExecuteLogin">
     <div class="row">
@@ -17,28 +17,26 @@
         <div class="col-auto">
             <button type="submit" class="btn btn-success">Log In</button>
         </div>
+
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" @onclick="GoToRegister">Register</button>
+        </div>
     </div>
 </EditForm>
 
 @code {
     private AuthenticationUserModel authModel = new();
 
-    private bool showAuthenticationError = false;
-    private string errorMessage = string.Empty;
-
     private async Task ExecuteLogin()
     {
-        showAuthenticationError = false;
-        errorMessage = string.Empty;
-
-        var result = await authService.Login(authModel);
+        var result = await AuthService.Login(authModel);
 
         if (result != null)
-            navigationManager.NavigateTo("/");
-        else
-        {
-            errorMessage = "There was an error when trying to log in.";
-            showAuthenticationError = true;
-        }
+            NavigationManager.NavigateTo("/");
+    }
+
+    private void GoToRegister()
+    {
+        NavigationManager.NavigateTo("/register");
     }
 }
