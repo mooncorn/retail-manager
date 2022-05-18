@@ -23,7 +23,7 @@ namespace Portal.Authentication
 
         private static void ExtractRolesFromJWT(List<Claim> claims, Dictionary<string, object> keyValuePairs)
         {
-            keyValuePairs.TryGetValue(ClaimTypes.Role, out object roles);
+            keyValuePairs.TryGetValue(ClaimTypes.Role, out object? roles);
 
             if (roles != null)
             {

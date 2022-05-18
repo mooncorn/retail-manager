@@ -28,7 +28,7 @@ namespace Portal.Authentication
             _httpClient.BaseAddress = new Uri(_config["api"]);
         }
 
-        public async Task<AuthenticatedUserModel> Login(AuthenticationUserModel credentials)
+        public async Task<AuthenticatedUserModel?> Login(AuthenticationUserModel credentials)
         {
             var data = new FormUrlEncodedContent(new[]
             {
@@ -45,6 +45,9 @@ namespace Portal.Authentication
             var result = JsonSerializer.Deserialize<AuthenticatedUserModel>(
                 authContent,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (result == null)
+                return null;
 
             await _localStorageService.SetItemAsStringAsync(TokenKeyName, result.Access_Token);
 
