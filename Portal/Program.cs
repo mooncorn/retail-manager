@@ -25,17 +25,6 @@ builder.Services
     .AddTransient<IUserEndpoint, UserEndpoint>()
     .AddTransient<ISaleEndpoint, SaleEndpoint>();
 
-//_container
-//    .PerRequest<IProductEndpoint, ProductEndpoint>()
-//    .PerRequest<ISaleEndpoint, SaleEndpoint>()
-//    .PerRequest<IUserEndpoint, UserEndpoint>();
-
-//_container
-//    .Singleton<IWindowManager, WindowManager>()
-//    .Singleton<IEventAggregator, EventAggregator>()
-//    .Singleton<ILoggedInUserModel, LoggedInUserModel>()
-//    .Singleton<IAPIHelper, APIHelper>();
-
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 await builder.Build().RunAsync();
