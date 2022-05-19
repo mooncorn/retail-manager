@@ -3,7 +3,7 @@
 namespace Portal.Models
 {
     /// <summary>
-    /// Information needed to send to receive an access token from the server.
+    /// Information needed to send in order receive an access token from the server.
     /// </summary>
     public class AuthenticationUserModel
     {

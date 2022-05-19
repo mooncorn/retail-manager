@@ -1,0 +1,54 @@
+﻿@page "/products"
+@attribute [Authorize(Roles = "Cashier")]
+@inject IProductEndpoint ProductEndpoint
+
+<h3>Products</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Retail Price</th>
+            <th scope="col">Quantity In Stock</th>
+            <th scope="col">Created Date</th>
+            <th scope="col">Taxable</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in products)
+        {
+            <tr>
+                <th scope="row">@product.Id</th>
+                <td><a href="/product/@product.Id">@product.ProductName</a></td>
+                <td>@product.Description</td>
+                <td>@product.RetailPrice</td>
+                <td>@product.QuantityInStock</td>
+                <td>@product.CreatedDate</td>
+                <td>@product.IsTaxable</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<ProductModel> products = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProductsAsync();
+    }
+
+    private async Task LoadProductsAsync()
+    {
+        try
+        {
+            products = await ProductEndpoint.GetAll();
+        } 
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+}

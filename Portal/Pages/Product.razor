@@ -1,0 +1,11 @@
+﻿@page "/product/{Id}"
+@attribute [Authorize(Roles = "Cashier")]
+
+<h3>Product</h3>
+
+@Id
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+}
