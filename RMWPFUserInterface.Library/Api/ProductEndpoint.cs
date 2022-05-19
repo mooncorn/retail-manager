@@ -10,7 +10,7 @@ namespace RMWPFUserInterface.Library.Api
 {
     public class ProductEndpoint : IProductEndpoint
     {
-        private IAPIHelper _apiHelper;
+        private readonly IAPIHelper _apiHelper;
 
         public ProductEndpoint(IAPIHelper apiHelper)
         {
@@ -19,16 +19,14 @@ namespace RMWPFUserInterface.Library.Api
 
         public async Task<List<ProductModel>> GetAll()
         {
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/Product/All"))
+            using HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/Product/All");
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<List<ProductModel>>();
-                }
-                else
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                return await response.Content.ReadAsAsync<List<ProductModel>>();
+            }
+            else
+            {
+                throw new Exception(response.ReasonPhrase);
             }
         }
     }

@@ -19,8 +19,7 @@ namespace RMDesktopUI.Helpers
 
         public static string GetBoundPassword(DependencyObject d)
         {
-            var box = d as PasswordBox;
-            if (box != null)
+            if (d is PasswordBox box)
             {
                 // this funny little dance here ensures that we've hooked the
                 // PasswordChanged event once, and only once.
@@ -41,9 +40,7 @@ namespace RMDesktopUI.Helpers
 
         private static void OnBoundPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var box = d as PasswordBox;
-
-            if (box == null)
+            if (d is not PasswordBox box)
                 return;
 
             box.Password = GetBoundPassword(d);
@@ -51,9 +48,7 @@ namespace RMDesktopUI.Helpers
 
         private static void PasswordChanged(object sender, RoutedEventArgs e)
         {
-            PasswordBox? password = sender as PasswordBox;
-
-            if (password == null)
+            if (sender is not PasswordBox password)
                 throw new InvalidOperationException();
 
             SetBoundPassword(password, password.Password);

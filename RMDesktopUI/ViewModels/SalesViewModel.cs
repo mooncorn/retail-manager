@@ -18,16 +18,16 @@ namespace RMDesktopUI.ViewModels
     public class SalesViewModel : Screen
     {
         private BindingList<ProductModel> _products;
-        private ProductModel _selectedProduct;
+        private ProductModel? _selectedProduct;
         private BindingList<CartItemModel> _cart;
-        private CartItemModel _selectedCartProduct;
-        private StatusInfoViewModel _statusInfo;
+        private CartItemModel? _selectedCartProduct;
+        private readonly StatusInfoViewModel _statusInfo;
         private readonly IWindowManager _windowManager;
         private int _itemQuantity;
-        private IProductEndpoint _productEnpoint;
-        private ISaleEndpoint _saleEndpoint;
-        private IConfiguration _config;
-        private IEventAggregator _events;
+        private readonly IProductEndpoint _productEnpoint;
+        private readonly ISaleEndpoint _saleEndpoint;
+        private readonly IConfiguration _config;
+        private readonly IEventAggregator _events;
 
         public BindingList<ProductModel> Products
         {
@@ -39,7 +39,7 @@ namespace RMDesktopUI.ViewModels
             }
         }
 
-        public ProductModel SelectedProduct
+        public ProductModel? SelectedProduct
         {
             get { return _selectedProduct; }
             set
@@ -60,7 +60,7 @@ namespace RMDesktopUI.ViewModels
             }
         }
 
-        public CartItemModel SelectedCartProduct
+        public CartItemModel? SelectedCartProduct
         {
             get { return _selectedCartProduct; }
             set
@@ -105,8 +105,9 @@ namespace RMDesktopUI.ViewModels
             _events = events;
             _statusInfo = statusInfoViewModel;
             _windowManager = windowManager;
-            Cart = new BindingList<CartItemModel>();
+            _cart = new BindingList<CartItemModel>();
             _itemQuantity = 1;
+            _products = new BindingList<ProductModel>();
         }
 
         protected override async void OnViewLoaded(object view)
@@ -145,6 +146,9 @@ namespace RMDesktopUI.ViewModels
 
         public void AddToCart()
         {
+            if (SelectedProduct is null)
+                return;
+
             var existingItem = Cart.FirstOrDefault((item) => item.Product.Id == SelectedProduct.Id);
             if (existingItem != null)
             {
@@ -153,7 +157,7 @@ namespace RMDesktopUI.ViewModels
             }
             else
             {
-                CartItemModel cartItem = new CartItemModel
+                CartItemModel cartItem = new()
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ItemQuantity,
@@ -173,6 +177,9 @@ namespace RMDesktopUI.ViewModels
 
         public void RemoveFromCart()
         {
+            if (SelectedCartProduct is null)
+                return;
+
             var existingItem = Products.FirstOrDefault((item) => item.Id == SelectedCartProduct.Product.Id);
             if (existingItem == null)
                 throw new Exception("Product does not exist in the product list");
@@ -194,7 +201,7 @@ namespace RMDesktopUI.ViewModels
 
         public async Task CheckOut()
         {
-            SaleModel saleModel = new SaleModel();
+            SaleModel saleModel = new();
 
             foreach (CartItemModel item in Cart)
             {

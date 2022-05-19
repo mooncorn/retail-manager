@@ -13,8 +13,8 @@ namespace RMWPFUserInterface.Library.Api
     public class APIHelper : IAPIHelper
     {
         private HttpClient _apiClient;
-        private ILoggedInUserModel _loggedInUser;
-        private IConfiguration _config;
+        private readonly ILoggedInUserModel _loggedInUser;
+        private readonly IConfiguration _config;
 
         public HttpClient ApiClient { get { return _apiClient; } }
 
@@ -27,10 +27,12 @@ namespace RMWPFUserInterface.Library.Api
 
         private void InitializeClient()
         {
-            string api = _config.GetValue<string>("Api");
+            string api = _config.GetValue<string>("api");
 
-            _apiClient = new HttpClient();
-            _apiClient.BaseAddress = new Uri(api);
+            _apiClient = new HttpClient
+            {
+                BaseAddress = new Uri(api)
+            };
             _apiClient.DefaultRequestHeaders.Accept.Clear();
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
@@ -44,16 +46,14 @@ namespace RMWPFUserInterface.Library.Api
                 new KeyValuePair<string, string>("password", password)
             });
 
-            using (HttpResponseMessage response = await _apiClient.PostAsync("/api/Token", data))
+            using HttpResponseMessage response = await _apiClient.PostAsync("/api/Token", data);
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<AuthenticatedUserModel>();
-                }
-                else
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                return await response.Content.ReadAsAsync<AuthenticatedUserModel>();
+            }
+            else
+            {
+                throw new Exception(response.ReasonPhrase);
             }
         }
 
@@ -63,23 +63,21 @@ namespace RMWPFUserInterface.Library.Api
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            using (HttpResponseMessage response = await _apiClient.GetAsync("/api/User"))
+            using HttpResponseMessage response = await _apiClient.GetAsync("/api/User");
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    var userDetails = await response.Content.ReadAsAsync<LoggedInUserModel>();
-                    
-                    _loggedInUser.Token = token;
-                    _loggedInUser.Id = userDetails.Id;
-                    _loggedInUser.FirstName = userDetails.FirstName;
-                    _loggedInUser.LastName = userDetails.LastName;
-                    _loggedInUser.EmailAddress = userDetails.EmailAddress;
-                    _loggedInUser.CreatedDate = userDetails.CreatedDate;
-                }
-                else
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                var userDetails = await response.Content.ReadAsAsync<LoggedInUserModel>();
+
+                _loggedInUser.Token = token;
+                _loggedInUser.Id = userDetails.Id;
+                _loggedInUser.FirstName = userDetails.FirstName;
+                _loggedInUser.LastName = userDetails.LastName;
+                _loggedInUser.EmailAddress = userDetails.EmailAddress;
+                _loggedInUser.CreatedDate = userDetails.CreatedDate;
+            }
+            else
+            {
+                throw new Exception(response.ReasonPhrase);
             }
         }
 

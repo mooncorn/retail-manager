@@ -16,7 +16,7 @@ namespace RMApi.Controllers
     [Authorize]
     public class UserController : ControllerBase
     {
-        private IUserData _userData;
+        private readonly IUserData _userData;
         private readonly ILogger<UserController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
@@ -90,7 +90,7 @@ namespace RMApi.Controllers
         [Route("Admin/GetAll")]
         public List<ApplicationUserModel> GetAll()
         {
-            List<ApplicationUserModel> userList = new List<ApplicationUserModel>();
+            List<ApplicationUserModel> userList = new();
 
             var users = _context.Users.ToList();
             var userRoles = from userRole in _context.UserRoles
@@ -99,7 +99,7 @@ namespace RMApi.Controllers
 
             foreach (var user in users)
             {
-                ApplicationUserModel appUser = new ApplicationUserModel
+                ApplicationUserModel appUser = new()
                 {
                     Id = user.Id,
                     Email = user.Email,

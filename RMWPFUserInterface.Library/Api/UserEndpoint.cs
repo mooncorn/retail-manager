@@ -21,42 +21,36 @@ namespace RMWPFUserInterface.Library.Api
         {
             var data = new { newUser.FirstName, newUser.LastName, Email = newUser.EmailAddress, newUser.Password }; // no need to send confirm password
 
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Register", data))
+            using HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Register", data);
+            if (!response.IsSuccessStatusCode)
             {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                throw new Exception(response.ReasonPhrase);
             }
         }
 
         public async Task<List<UserModel>> GetAll()
         {
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/User/Admin/GetAll"))
+            using HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/User/Admin/GetAll");
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<List<UserModel>>();
-                }
-                else
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                return await response.Content.ReadAsAsync<List<UserModel>>();
+            }
+            else
+            {
+                throw new Exception(response.ReasonPhrase);
             }
         }
 
         public async Task<Dictionary<string, string>> GetAllRoles()
         {
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/User/Admin/GetAllRoles"))
+            using HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/User/Admin/GetAllRoles");
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsAsync<Dictionary<string, string>>();
-                }
-                else
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                return await response.Content.ReadAsAsync<Dictionary<string, string>>();
+            }
+            else
+            {
+                throw new Exception(response.ReasonPhrase);
             }
         }
 
@@ -64,12 +58,10 @@ namespace RMWPFUserInterface.Library.Api
         {
             var data = new { userId, roleName };
 
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/AssignRole", data))
+            using HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/AssignRole", data);
+            if (!response.IsSuccessStatusCode)
             {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                throw new Exception(response.ReasonPhrase);
             }
         }
 
@@ -77,12 +69,10 @@ namespace RMWPFUserInterface.Library.Api
         {
             var data = new { userId, roleName };
 
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/UnassignRole", data))
+            using HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/UnassignRole", data);
+            if (!response.IsSuccessStatusCode)
             {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                throw new Exception(response.ReasonPhrase);
             }
         }
     }

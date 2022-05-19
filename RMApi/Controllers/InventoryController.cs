@@ -11,7 +11,7 @@ namespace RMApi.Controllers
     [Authorize]
     public class InventoryController : ControllerBase
     {
-        private IInventoryData _inventoryData;
+        private readonly IInventoryData _inventoryData;
 
         public InventoryController(IInventoryData inventoryData)
         {

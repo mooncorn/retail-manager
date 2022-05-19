@@ -12,7 +12,7 @@ namespace RMApi.Controllers
     [Authorize]
     public class SaleController : ControllerBase
     {
-        private ISaleData _saleData;
+        private readonly ISaleData _saleData;
 
         public SaleController(ISaleData saleData)
         {

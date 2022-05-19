@@ -14,9 +14,12 @@ namespace Portal.Authentication
 
             var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadBytes);
 
+            if (keyValuePairs == null)
+                return claims;
+
             ExtractRolesFromJWT(claims, keyValuePairs);
 
-            claims.AddRange(keyValuePairs.Select(keyValue => new Claim(keyValue.Key, keyValue.Value.ToString())));
+            claims.AddRange(keyValuePairs.Select(keyValue => new Claim(keyValue.Key, keyValue.Value.ToString() ?? "")));
 
             return claims;
         }
@@ -27,7 +30,8 @@ namespace Portal.Authentication
 
             if (roles != null)
             {
-                var parsedRoles = roles.ToString().Trim().TrimStart('[').TrimEnd(']').Split(',');
+                string stringifiedObject = roles.ToString() ?? "";
+                var parsedRoles = stringifiedObject.Trim().TrimStart('[').TrimEnd(']').Split(',');
 
                 if (parsedRoles.Length > 1)
                 {
@@ -56,7 +60,7 @@ namespace Portal.Authentication
                     base64 += "==";
                     break;
                 case 3:
-                    base64 = "=";
+                    base64 += "=";
                     break;
             }
             

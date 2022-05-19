@@ -14,14 +14,15 @@ namespace RMDesktopUI.ViewModels
     {
         private string _username = "admin@admin.com";
         private string _password = "Admin1!";
-        private IAPIHelper _apiHelper;
+        private readonly IAPIHelper _apiHelper;
         private string _errorMessage;
-        private IEventAggregator _events;
+        private readonly IEventAggregator _events;
 
         public LoginViewModel(IAPIHelper apiHelper, IEventAggregator events)
         {
             _apiHelper = apiHelper;
             _events = events;
+            _errorMessage = String.Empty;
         }
 
         public string Username

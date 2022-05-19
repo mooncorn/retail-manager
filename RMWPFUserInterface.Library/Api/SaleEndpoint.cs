@@ -10,7 +10,7 @@ namespace RMWPFUserInterface.Library.Api
 {
     public class SaleEndpoint : ISaleEndpoint
     {
-        private IAPIHelper _apiHelper;
+        private readonly IAPIHelper _apiHelper;
 
         public SaleEndpoint(IAPIHelper apiHelper)
         {
@@ -19,11 +19,9 @@ namespace RMWPFUserInterface.Library.Api
 
         public async Task PostSale(SaleModel sale)
         {
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/Sale", sale))
-            {
-                if (!response.IsSuccessStatusCode)
-                    throw new Exception(response.ReasonPhrase);
-            }
+            using HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/Sale", sale);
+            if (!response.IsSuccessStatusCode)
+                throw new Exception(response.ReasonPhrase);
         }
     }
 }

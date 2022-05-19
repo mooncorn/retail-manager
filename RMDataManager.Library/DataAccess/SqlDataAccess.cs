@@ -9,16 +9,16 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace RMDataManager.Library.Internal.DataAccess
+namespace RMDataManager.Library.DataAccess
 {
     public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
+        private readonly ILogger<SqlDataAccess> _logger;
         private IDbConnection _connection;
-        ILogger<SqlDataAccess> _logger;
         private IDbTransaction _transaction;
         private bool isClosed;
 
-        private IConfiguration _config;
+        private readonly IConfiguration _config;
 
         public SqlDataAccess(IConfiguration config, ILogger<SqlDataAccess> logger)
         {
@@ -35,20 +35,16 @@ namespace RMDataManager.Library.Internal.DataAccess
         {
             string connectionString = GetConnectionString(connectionStringName);
 
-            using (IDbConnection connection = new SqlConnection(connectionString))
-            {
-                return connection.Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure).ToList();
-            }
+            using IDbConnection connection = new SqlConnection(connectionString);
+            return connection.Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure).ToList();
         }
 
         public void SaveData<T>(string storedProcedure, T parameters, string connectionStringName)
         {
             string connectionString = GetConnectionString(connectionStringName);
 
-            using (IDbConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Execute(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-            }
+            using IDbConnection connection = new SqlConnection(connectionString);
+            connection.Execute(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
         }
 
         public void StartTransaction(string connectionStringName)
@@ -91,6 +87,7 @@ namespace RMDataManager.Library.Internal.DataAccess
 
             _transaction = null;
             _connection = null;
+            GC.SuppressFinalize(this);
         }
 
         public void SaveDataInTransaction<T>(string storedProcedure, T parameters)

@@ -11,7 +11,7 @@ namespace RMApi.Controllers
     [Authorize(Roles = "Cashier")]
     public class ProductController : ControllerBase
     {
-        private IProductData _productData;
+        private readonly IProductData _productData;
 
         public ProductController(IProductData productData)
         {

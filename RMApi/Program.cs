@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using RMDataManager.Library.DataAccess;
-using RMDataManager.Library.Internal.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
