@@ -12,7 +12,16 @@ namespace Portal.Authentication
 
             var payloadBytes = ParseBase64WithoutPadding(payload);
 
-            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadBytes);
+            Dictionary<string, object>? keyValuePairs = null;
+
+            try
+            {
+                keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadBytes);
+            } 
+            catch (Exception ex)
+            {
+                // TODO: Log this error
+            }
 
             if (keyValuePairs == null)
                 return claims;
