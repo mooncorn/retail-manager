@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using RMDataManager.Library.DataAccess;
 using RMDataManager.Library.Internal.DataAccess;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,7 +61,11 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.FromMinutes(5),
     };
-});
+})
+    .AddCookie(options =>
+    {
+        options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+    });
 
 builder.Services.AddSwaggerGen(options =>
 {
